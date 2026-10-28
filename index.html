@@ -345,6 +345,30 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 @media (max-width:860px){.hero,.studio{grid-template-columns:1fr}.feat{grid-template-columns:1fr}.wz{grid-template-columns:1fr}.wz .stage{order:-1}.opts{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:420px){nav button{padding:8px 10px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){.inv .in>*,.inv .orn{animation:none}}
+
+/* backend ui */
+button.hb{cursor:pointer}
+.am{position:fixed;inset:0;z-index:80;background:rgba(10,14,20,.6);display:grid;place-items:center;padding:16px}.am[hidden]{display:none}
+.amc{position:relative;width:min(400px,100%);background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:22px;padding:28px 24px 22px;display:grid;gap:14px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.amc h3{margin:0;font:700 22px Amiri,serif;color:var(--gd)}
+.amc label{display:grid;gap:6px;font-size:14px;color:var(--mu)}
+.amc input{font:400 16px Tajawal,sans-serif;padding:12px 14px;border-radius:12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx)}
+.amx{position:absolute;top:10px;inset-inline-end:12px;width:36px;height:36px;border-radius:50%;border:0;background:none;color:var(--mu);font-size:24px;cursor:pointer}
+.amm{margin:0;min-height:22px;font-size:14px;color:#B3261E}.amm.ok{color:#1E7B3E}
+.lkb{display:grid;gap:10px;justify-items:stretch;width:100%}.lkb input{font:400 14px Tajawal,sans-serif;padding:11px 12px;border-radius:12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);width:100%}
+.lkb .nx{justify-content:center;text-decoration:none}
+#pubv{position:fixed;inset:0;z-index:70;background:#0B0F14;display:grid;place-items:center;overflow:hidden}#pubv[hidden]{display:none}
+.pm{color:#fff;font:500 18px Tajawal,sans-serif;padding:24px;text-align:center;margin:0}
+.mh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#myl{display:grid;gap:16px;margin-top:18px}
+.ic2{background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:18px 20px;display:grid;gap:12px}
+.ic2 h3{margin:0;font:700 20px Tajawal,sans-serif}.ic2 .tg{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--ln);color:var(--mu);margin-inline-start:8px}
+.ic2 .st{display:flex;gap:18px;flex-wrap:wrap;font-size:15px}.ic2 .st b{color:var(--gd);font-size:20px}
+.ic2 .ab{display:flex;gap:8px;flex-wrap:wrap}.ic2 .ab .nx{padding:9px 16px;font-size:14px;text-decoration:none}
+.rl{display:grid;gap:8px;border-top:1px solid var(--ln);padding-top:12px}
+.rr{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:15px}
+.rr small{color:var(--mu);grid-column:1/-1}.rr .y{color:#1E7B3E;font-weight:700}.rr .n{color:#B3261E;font-weight:700}
+.emp{text-align:center;padding:40px 16px;color:var(--mu)}
 </style>
 </head>
 <body>
@@ -359,7 +383,7 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
     <button data-go="page:شركاؤنا">شركاؤنا</button>
     <button data-go="page:تواصل معنا">تواصل معنا</button>
   </nav>
-  <div class="hp"><span class="hb" data-ic="bell" role="img" aria-label="الإشعارات"></span><span class="hb hide"><span data-ic="globe"></span>EN</span><span class="hb"><span class="av" data-ic="user"></span>حسابي</span></div>
+  <div class="hp"><span class="hb" data-ic="bell" role="img" aria-label="الإشعارات"></span><span class="hb hide"><span data-ic="globe"></span>EN</span><button class="hb" id="acc" type="button"><span class="av" data-ic="user"></span><span id="accL">حسابي</span></button></div>
 </header>
 <main>
 <section class="v" id="home">
@@ -386,14 +410,23 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
   <div class="grid" id="grid"></div>
 </section>
 
+<section class="v" id="my" hidden>
+  <div class="mh"><h2 class="t" style="margin:0">دعواتي</h2><div class="ab" style="display:flex;gap:8px;flex-wrap:wrap"><button class="pill sm" data-a="mynew"><span data-ic="spark"></span>دعوة جديدة</button><button class="pill sm" data-a="myout">تسجيل الخروج</button></div></div>
+  <p class="sub" id="mye"></p>
+  <div id="myl"></div>
+</section>
+
 <section class="v" id="studio" hidden>
   <div class="sh"><h2 class="t">إنشاء دعوة</h2><div class="sact"><button class="pill sm" data-a="shr"><span data-ic="share"></span>مشاركة</button><button class="pill sm" data-a="nwi"><span data-ic="user"></span>دعوة +</button></div></div>
   <div id="stp"></div>
   <div class="wz"><div id="wz"></div><div class="stage"><div class="phone lt"><div class="notch k"></div><div id="studioInv"></div></div></div></div>
 </section>
 </main>
+<div id="pubv" hidden><div id="pubb"></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
+const PUBSLUG=new URLSearchParams(location.search).get('i');let PUB=null,user=null,afterAuth=null,sb=null;
 const T=[
 {n:'ليالي الذهب',b:['#14262B','#0B1719'],ink:'#F3EBDD',ac:'#D6B15E',f:'Amiri,serif',fx:'stars',ev:'wedding',names:'ليلى وعمر'},
 {n:'ورد الفجر',b:['#F7E4E0','#EBC4C0'],ink:'#4A2530',ac:'#A8404F',f:'Amiri,serif',fx:'petals',ev:'engage',names:'نورة وفيصل'},
@@ -615,6 +648,8 @@ document.addEventListener('click',e=>{
   const mp=t.closest('.mpl');if(mp){const au=inv.querySelector('.au');if(au){if(au.paused){try{if(au.currentTime<(+au.dataset.off||0))au.currentTime=+au.dataset.off||0}catch(_){}au.play().catch(()=>{});mp.textContent='⏸ إيقاف'}else{au.pause();mp.textContent='▶ تشغيل'}}return}
   const rb=t.closest('.ry,.rno');if(rb){const f=rb.closest('.rsf'),n=f.querySelector('.rn').value.trim(),g=(f.querySelector('.rg')||{value:'1'}).value,note=((f.querySelector('.rmsg')||{value:''}).value||'').trim(),yes=rb.classList.contains('ry'),num=rb.dataset.wa,m=f.querySelector('.rm');
     if(!n){m.style.color='#B3261E';m.textContent='اكتب اسمك أولاً';return}
+    if(PUB){m.style.color='#6B7280';m.textContent='جارٍ الإرسال…';
+      sbRsvp(PUB.slug,n,g,note,yes?'yes':'no').then(ok=>{if(ok){if(yes)showPass(inv,n,g);m.style.color='#1E7B3E';m.textContent=yes?'شكراً لك، تم تأكيد حضورك ✓':'شكراً لإبلاغنا'}else{m.style.color='#B3261E';m.textContent='تعذّر الإرسال، حاول مرة أخرى'}});return}
     const txt=(yes?n+' - سأحضر بإذن الله'+(f.querySelector('.rg')?' (عدد الحضور: '+g+')':''):n+' - أعتذر عن الحضور')+(note?' — '+note:'');
     if(num)window.open('https://wa.me/'+num+'?text='+encodeURIComponent(txt),'_blank','noopener');
     if(yes)showPass(inv,n,g);
@@ -644,21 +679,23 @@ document.querySelector('.sact').addEventListener('click',e=>{const b=e.target.cl
 
 /* navigation */
 function go(v){
+  if(v==='my'&&!user){openAuth(()=>go('my'));return}
   const pg=v.startsWith('page:');document.querySelectorAll('.v').forEach(s=>s.hidden=s.id!==(pg?'soon':v));if(pg)$('#soonT').textContent=v.slice(5);
   document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.go===v));
   scrollTo(0,0);
   if(v==='studio')renderStudio(false);
+  if(v==='my')renderMy();
 }
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
 
 /* home */
 let h=0;
 const heroNext=()=>{mount($('#heroInv'),{...sample(T[h%T.length]),env:false},T[h%T.length]);h++};
-heroNext();setInterval(()=>{if(!$('#home').hidden)heroNext()},12000);
+if(!PUBSLUG){heroNext();setInterval(()=>{if(!$('#home').hidden)heroNext()},12000)}
 
 /* gallery */
 $('#grid').innerHTML=T.map((t,i)=>`<div class="card"><div class="th" data-i="${i}" tabindex="0" role="button" aria-label="جرّب قالب ${t.n}"></div><b>${t.n}</b><small>${E[t.ev][0]}</small><button class="btn" data-use="${i}">استخدم القالب</button></div>`).join('');
-document.querySelectorAll('.th').forEach(el=>{const t=T[+el.dataset.i];el.innerHTML=inv(sample(t),t);el.firstElementChild.classList.add('still');fx(el.querySelector('canvas'),t.fx,t.ac)});
+if(!PUBSLUG)document.querySelectorAll('.th').forEach(el=>{const t=T[+el.dataset.i];el.innerHTML=inv(sample(t),t);el.firstElementChild.classList.add('still');fx(el.querySelector('canvas'),t.fx,t.ac)});
 function use(i){S.t=i;S.d.ev=T[i].ev;nm(S.d,T[i].names);W={g:0,s:2};go('studio')}
 document.addEventListener('click',e=>{const u=e.target.closest('[data-use]'),t=e.target.closest('.th');if(u)use(+u.dataset.use);else if(t)use(+t.dataset.i)});
 document.addEventListener('keydown',e=>{const t=e.target.closest&&e.target.closest('.th');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();use(+t.dataset.i)}});
@@ -870,7 +907,7 @@ function panel(){
   if(W.g===0&&W.s===0&&DR&&!dismissed)h+=`<div class="prev"><button class="x" data-a="dis" aria-label="إغلاق">×</button><b>لديك دعوة سابقة</b><span class="note">${esc(DR.d.names)} · ${esc(DR.d.date)}</span><div><button class="nx dk" data-a="res">متابعة آخر دعوة</button></div></div>`;
   if(W.g===0){const t=ST[W.s];h+=card(t.t,t.q,t.b(),[W.s+1,n],(W.s+1)/n*100)+nav(t.t,'nx',W.s===n-1?'إنهاء':'التالي',1)}
   else if(W.g===1)h+=`<div class="qc pvw"><div class="pvh"><span data-ic="spark"></span><div><b>معاينة التصميم</b><p>راجع تصميم دعوتك قبل المتابعة.</p></div></div><div class="pvb2"><div class="pvn"><span data-ic="phone"></span>دعوتك تبدو تماماً كما سيراها ضيوفك. افتحها على هاتفك قبل المتابعة.</div><button class="pill wide" data-a="fp"><span data-ic="eye"></span>فتح المعاينة الكاملة</button><div class="pvr"><button class="pill dkp" data-a="nx">متابعة<span data-ic="chl"></span></button><button class="pill" data-a="bk">العودة للمعلومات<span data-ic="chl"></span></button></div><button class="lk" data-a="rp">↻ إعادة تشغيل الحركة</button></div></div>`;
-  else h+=card('المشاركة','دعوتك جاهزة',`<div class="fld"><a class="nx dk" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(plain())}">مشاركة عبر واتساب</a><button class="nx" data-a="copy">نسخ نص الدعوة</button><button class="nx" data-a="save">حفظ المسودة</button><p class="note" id="msgbox" role="status"></p></div>`,0,100)+nav('المشاركة','nw','دعوة جديدة',0);
+  else h+=card('المشاركة','دعوتك جاهزة',`<div class="fld">${pubBox()}<a class="nx dk" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(plain())}">مشاركة عبر واتساب</a><button class="nx" data-a="copy">نسخ نص الدعوة</button><button class="nx" data-a="save">حفظ المسودة</button><p class="note" id="msgbox" role="status"></p></div>`,0,100)+nav('المشاركة','nw','دعوة جديدة',0);
   $('#wz').innerHTML=h;icons($('#wz'));pv();
 }
 function draw(still){stepper();mount($('#studioInv'),S.d,tp(),still);panel()}
@@ -895,6 +932,8 @@ $('#wz').addEventListener('click',async e=>{
   else if(a==='rp')mount($('#studioInv'),S.d,tp(),false);
   else if(a==='nw'){S={t:0,d:sample(T[0])};W={g:0,s:0};cv=false;dismissed=true;draw(false)}
   else if(a==='copy'){try{await navigator.clipboard.writeText(plain());say('تم نسخ نص الدعوة.')}catch(_){say('تعذّر النسخ، انسخ النص يدوياً.')}}
+  else if(a==='pub')await publish();
+  else if(a==='cpl'){const l=pubUrl(S.slug);try{await navigator.clipboard.writeText(l);say('تم نسخ رابط الدعوة.')}catch(_){say('انسخ الرابط يدوياً.')}}
   else if(a==='save')save(true);
   else if(a==='cust'){cv=true;S.t='c';draw(false)}
   else if(a==='back'){cv=false;draw(true)}
@@ -957,7 +996,117 @@ $('#wz').addEventListener('change',e=>{
 });
 const IC={wa:'<path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.2A8.5 8.5 0 1 1 20 11.5z"/><path d="M9.2 8.6c-.3 2.6 2.7 5.8 5.8 5.9l1-1.4-2-1-.9.7a4 4 0 0 1-1.9-1.9l.7-.9-1-2z"/>',up:'<path d="M12 16V5M7 10l5-5 5 5M4 19h16"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-8 9"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0M16 4.5a3.5 3.5 0 0 1 0 7M18 20a7 7 0 0 0-3-5.7"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',check:'<path d="M5 12l5 5 9-10"/>',pal:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16" cy="10" r="1"/><path d="M12 21c-1.5 0-2-1.2-1.2-2.4.8-1.1.3-2.6-1.3-2.6H7"/>',chu:'<path d="M6 15l6-6 6 6"/>',chd:'<path d="M6 9l6 6 6-6"/>',chr:'<path d="M9 6l6 6-6 6"/>',chl:'<path d="M15 6l-6 6 6 6"/>',spark:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',pin:'<path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',heart:'<path d="M12 20s-8-4.8-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.2 12 20 12 20z"/>',music:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v1M14 21h3M21 18v3"/>',bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'};
 function icons(r){(r||document).querySelectorAll('[data-ic]').forEach(e=>{const z=e.classList.contains('fi')?(innerWidth<600?20:28):20;e.innerHTML=`<svg viewBox="0 0 24 24" width="${z}" height="${z}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[e.dataset.ic]}</svg>`})}icons();
-go('home');
+/* ===== backend (Supabase) ===== */
+const SB_URL='https://kmffgfpkskvoddtmllna.supabase.co',SB_KEY='sb_publishable_Ti5Gb3qHMoK3YBGjaQLHhA_xJnxYJ3S';
+try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(_){sb=null}
+const pubUrl=sl=>location.origin+location.pathname.replace(/index\.html$/,'')+'?i='+sl;
+const arErr=e=>{const m=String((e&&e.message)||e||'');
+  if(/Invalid login/i.test(m))return'البريد أو كلمة المرور غير صحيحة';
+  if(/already registered/i.test(m))return'هذا البريد مسجّل مسبقاً، سجّل الدخول';
+  if(/not confirmed/i.test(m))return'أكّد بريدك الإلكتروني أولاً من الرسالة التي وصلتك';
+  if(/rate limit|too many/i.test(m))return'محاولات كثيرة، انتظر قليلاً ثم حاول مجدداً';
+  if(/password/i.test(m))return'كلمة المرور ضعيفة أو غير صالحة (6 أحرف على الأقل)';
+  if(/fetch|network/i.test(m))return'تعذّر الاتصال بالخدمة، تأكد من الإنترنت';
+  return'حدث خطأ، حاول مرة أخرى'};
+/* auth modal */
+let amode='in';
+function setMode(m){amode=m;$('#amt').textContent=m==='in'?'تسجيل الدخول':'إنشاء حساب';$('#amg').textContent=m==='in'?'دخول':'إنشاء الحساب';$('#amsw').textContent=m==='in'?'ليس لديك حساب؟ أنشئ حساباً':'لديك حساب؟ سجّل الدخول';$('#apw').autocomplete=m==='in'?'current-password':'new-password'}
+const amsg=(t,ok)=>{const x=$('#amm');x.textContent=t||'';x.className='amm'+(ok?' ok':'')};
+function closeAuth(){const o=$('#am');if(o)o.hidden=true}
+function openAuth(cb){afterAuth=cb||null;let o=$('#am');
+  if(!o){o=document.createElement('div');o.id='am';o.className='am';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
+    o.innerHTML='<form class="amc" novalidate><button type="button" class="amx" aria-label="إغلاق">×</button><h3 id="amt"></h3><label>البريد الإلكتروني<input type="email" id="aem" autocomplete="email" dir="ltr"></label><label>كلمة المرور<input type="password" id="apw" dir="ltr"></label><p class="amm" id="amm" role="status"></p><button class="nx dk" type="submit" id="amg" style="justify-content:center"></button><button type="button" class="lk" id="amsw"></button></form>';
+    document.body.appendChild(o);
+    o.addEventListener('click',e=>{if(e.target===o||e.target.closest('.amx'))closeAuth()});
+    $('#amsw').addEventListener('click',()=>{setMode(amode==='in'?'up':'in');amsg('')});
+    o.querySelector('form').addEventListener('submit',async e=>{e.preventDefault();
+      const em=$('#aem').value.trim(),pw=$('#apw').value;amsg('');
+      if(!/^\S+@\S+\.\S+$/.test(em))return amsg('اكتب بريداً إلكترونياً صحيحاً');
+      if(pw.length<6)return amsg('كلمة المرور 6 أحرف على الأقل');
+      if(!sb)return amsg('الخدمة غير متاحة حالياً');
+      const b=$('#amg');b.disabled=true;
+      let r;try{r=amode==='in'?await sb.auth.signInWithPassword({email:em,password:pw}):await sb.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.origin+location.pathname}})}catch(x){r={error:x}}
+      b.disabled=false;
+      if(r.error)return amsg(arErr(r.error));
+      if(amode==='up'&&!(r.data&&r.data.session)){setMode('in');return amsg('تم إنشاء الحساب. افتح بريدك واضغط رابط التأكيد ثم سجّل الدخول.',1)}
+      closeAuth();const cb=afterAuth;afterAuth=null;if(cb)cb()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuth()})}
+  setMode('in');amsg('');o.hidden=false;$('#aem').focus()}
+function updAcc(){const l=$('#accL');if(l)l.textContent=user?'دعواتي':'حسابي'}
+if(sb){
+  sb.auth.getSession().then(({data})=>{user=(data.session&&data.session.user)||null;updAcc()});
+  sb.auth.onAuthStateChange((ev,ses)=>{user=(ses&&ses.user)||null;updAcc();if(ev==='SIGNED_OUT'&&!$('#my').hidden)go('home')})}
+$('#acc').addEventListener('click',()=>{if(user)go('my');else openAuth(()=>go('my'))});
+/* publish */
+function pubBox(){const l=S.slug?pubUrl(S.slug):'';
+  return `<button class="nx dk" data-a="pub" style="justify-content:center">${S.slug?'تحديث الدعوة المنشورة':'نشر الدعوة وإنشاء رابط'}</button>`
+   +(l?`<div class="lkb"><input readonly dir="ltr" value="${esc(l)}" aria-label="رابط الدعوة" onfocus="this.select()"><button class="nx" data-a="cpl">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح الدعوة</a><a class="nx dk" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(plain()+'\n\n'+l)}">إرسال الرابط عبر واتساب</a></div>`:'')
+   +`<p class="note">${user?'':'سجّل الدخول لنشر دعوتك وتلقّي ردود ضيوفك.'}</p>`}
+let pubBusy=false;
+async function publish(){
+  if(!sb)return say('الخدمة غير متاحة حالياً.');
+  if(!user)return openAuth(()=>publish());
+  if(pubBusy)return;pubBusy=true;say('جارٍ النشر…');
+  try{
+    const data=JSON.parse(JSON.stringify({t:S.t,d:S.d},(k,v)=>k==='music'?undefined:v));
+    if(JSON.stringify(data).length>6e6){say('حجم الصور كبير جداً، قلّل عدد الصور أو أحجامها.');return}
+    const row={title:(S.d.names||'دعوة').slice(0,120),data,status:'published'};
+    let r=null;
+    if(S.id){r=await sb.from('invitations').update(row).eq('id',S.id).select('id,slug').maybeSingle();if(r.error)throw r.error}
+    if(!r||!r.data){r=await sb.from('invitations').insert(row).select('id,slug').single();if(r.error)throw r.error}
+    S.id=r.data.id;S.slug=r.data.slug;save();panel();say('تم النشر ✓ رابط دعوتك جاهز.')
+  }catch(e){say('تعذّر النشر: '+arErr(e))}
+  finally{pubBusy=false}
+}
+/* guest RSVP */
+async function sbRsvp(slug,name,guests,note,status){
+  if(!sb)return false;
+  try{const{error}=await sb.rpc('submit_rsvp',{p_slug:slug,p_name:name.slice(0,100),p_phone:null,p_status:status,p_guests:status==='yes'?Math.min(20,Math.max(1,+guests||1)):0,p_note:note?note.slice(0,500):null});return !error}catch(_){return false}
+}
+/* public page */
+async function bootPublic(){
+  document.querySelector('header').style.display='none';document.querySelector('main').style.display='none';
+  const p=$('#pubv'),box=$('#pubb');p.hidden=false;
+  if(!sb){box.innerHTML='<p class="pm">الخدمة غير متاحة حالياً.</p>';return}
+  box.innerHTML='<p class="pm">جارٍ تحميل الدعوة…</p>';
+  let r;try{r=await sb.rpc('get_invitation',{p_slug:PUBSLUG})}catch(_){r={error:1}}
+  if(r.error||!r.data){box.innerHTML='<p class="pm">هذه الدعوة غير موجودة أو لم تعد متاحة.</p>';return}
+  const dd=r.data.data||{},t=dd.t==='c'?CU:(T[dd.t]||T[0]);
+  PUB={slug:PUBSLUG};document.title=r.data.title||'دعوة';
+  box.innerHTML='';mount(box,dd.d,t,false);
+  const fit=()=>{const e=box.firstElementChild;if(e)e.style.zoom=Math.min(innerHeight/640,innerWidth/360)};fit();addEventListener('resize',fit);
+}
+/* dashboard */
+let RS={};
+async function renderMy(){
+  const el=$('#myl');$('#mye').textContent=user?user.email:'';
+  el.innerHTML='<p class="note">جارٍ التحميل…</p>';
+  let a,b;try{[a,b]=await Promise.all([sb.from('invitations').select('id,slug,title,status,created_at').order('created_at',{ascending:false}),sb.from('rsvps').select('invitation_id,name,status,guests,note,created_at').order('created_at',{ascending:false})])}catch(_){a={error:1}}
+  if(a.error){el.innerHTML='<p class="note">تعذّر تحميل الدعوات.</p>';return}
+  RS={};(b.data||[]).forEach(r=>(RS[r.invitation_id]=RS[r.invitation_id]||[]).push(r));
+  if(!a.data.length){el.innerHTML='<div class="emp">لا توجد دعوات منشورة بعد.<br>أنشئ دعوتك من الاستوديو واضغط «نشر الدعوة».</div>';return}
+  const fmt=t=>new Date(t).toLocaleString('ar-SA',{dateStyle:'medium',timeStyle:'short'});
+  el.innerHTML=a.data.map(i=>{const rs=RS[i.id]||[],y=rs.filter(r=>r.status==='yes'),n=rs.filter(r=>r.status==='no'),g=y.reduce((s,r)=>s+r.guests,0),l=pubUrl(i.slug);
+    return `<article class="ic2" data-id="${i.id}"><div><h3>${esc(i.title)}<span class="tg">${i.status==='published'?'منشورة':'مسودة'}</span></h3><small class="note">${fmt(i.created_at)}</small></div>
+<div class="st"><span><b>${y.length}</b> سيحضرون (${g} شخص)</span><span><b>${n.length}</b> معتذرون</span></div>
+<div class="lkb"><input readonly dir="ltr" value="${esc(l)}" aria-label="رابط الدعوة" onfocus="this.select()"></div>
+<div class="ab"><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح</a><button class="nx" data-m="cp" data-l="${esc(l)}">نسخ الرابط</button><a class="nx dk" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(l)}">واتساب</a><button class="nx" data-m="rs">الردود (${rs.length})</button><button class="nx" data-m="ed">تعديل</button><button class="nx" data-m="rm">حذف</button></div>
+<div class="rl" hidden>${rs.length?rs.map(r=>`<div class="rr"><b>${esc(r.name)}</b><span class="${r.status==='yes'?'y':'n'}">${r.status==='yes'?'سيحضر ('+r.guests+')':'معتذر'}</span>${r.note?`<small>${esc(r.note)}</small>`:''}<small>${fmt(r.created_at)}</small></div>`).join(''):'<p class="note">لا توجد ردود بعد.</p>'}</div></article>`}).join('');
+}
+$('#my').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-m],[data-a]');if(!b)return;
+  if(b.dataset.a==='mynew'){S={t:0,d:sample(T[0])};W={g:0,s:0};cv=false;dismissed=true;go('studio');return}
+  if(b.dataset.a==='myout'){if(sb)await sb.auth.signOut();go('home');return}
+  const card=b.closest('.ic2'),id=card&&card.dataset.id,m=b.dataset.m;
+  if(m==='cp'){try{await navigator.clipboard.writeText(b.dataset.l);b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
+  else if(m==='rs'){const r=card.querySelector('.rl');r.hidden=!r.hidden}
+  else if(m==='ed'){b.disabled=true;const r=await sb.from('invitations').select('id,slug,data').eq('id',id).single();b.disabled=false;
+    if(r.error||!r.data||!r.data.data||!r.data.data.d){alert('تعذّر فتح الدعوة للتعديل.');return}
+    S={t:r.data.data.t,d:r.data.data.d,id:r.data.id,slug:r.data.slug};W={g:1,s:0};cv=S.t==='c';dismissed=true;go('studio')}
+  else if(m==='rm'){if(!confirm('حذف هذه الدعوة وكل ردودها نهائياً؟'))return;const r=await sb.from('invitations').delete().eq('id',id);if(r.error)alert('تعذّر الحذف.');else renderMy()}
+});
+if(PUBSLUG)bootPublic();else go('home');
+
 </script>
 </body>
 </html>
