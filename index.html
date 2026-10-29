@@ -344,7 +344,6 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .inv .rs.ok{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
 @media (max-width:860px){.hero,.studio{grid-template-columns:1fr}.feat{grid-template-columns:1fr}.wz{grid-template-columns:1fr}.wz .stage{order:-1}.opts{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:420px){nav button{padding:8px 10px;font-size:14px}}
-@media (prefers-reduced-motion:reduce){.inv .in>*,.inv .orn{animation:none}}
 
 /* backend ui */
 button.hb{cursor:pointer}
@@ -436,7 +435,7 @@ const T=[
 {n:'ليلة الأضواء',b:['#3B1C5A','#1E0F33'],ink:'#FFFFFF',ac:'#FF7AB6',f:"'Reem Kufi',sans-serif",fx:'lights',ev:'bday',names:'جود'}
 ];
 const E={wedding:['زفاف','يتشرف بدعوتكم لحضور حفل زفاف','👰'],engage:['خطوبة','يسعدنا دعوتكم لحضور حفل خطوبة','💍'],nikah:['عقد قران','يتشرفون بدعوتكم لحضور حفل عقد القران','🕌'],henna:['حنة','يسعدنا دعوتكم لحضور ليلة الحناء','💃'],gender:['الكشف عن الجنس','ندعوكم لمشاركتنا لحظة الكشف عن جنس المولود','🎊',1],bridal:['حفلة العروس','تتشرف بدعوتكم لحضور حفلة العروس','🎀',1],grad:['تخرج','يدعوكم للمشاركة في حفل تخرجه','🎓',1],aqiqa:['عقيقة','يتشرفون بدعوتكم لحضور حفل عقيقة المولود','🍼',1],bday:['عيد ميلاد','تدعوكم لحضور حفل عيد ميلاد','🎂',1],dinner:['مناسبة أخرى','تتشرف بدعوتكم لحضور','✨']};
-const $=s=>document.querySelector(s),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const $=s=>document.querySelector(s),RM=false;/* حركة الدعوة جوهر المنتج: لا نعطّلها حسب إعداد تقليل الحركة في الجهاز */
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const inDays=n=>{const d=new Date(Date.now()+n*864e5);return d.toISOString().slice(0,10)};
 const DCC=['#E9E9E9','#E0A0A4','#D96060','#D93A35','#D93020','#D82E1E'];
