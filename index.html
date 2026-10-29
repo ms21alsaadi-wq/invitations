@@ -367,6 +367,7 @@ button.hb{cursor:pointer}
 .rl{display:grid;gap:8px;border-top:1px solid var(--ln);padding-top:12px}
 .rr{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:15px}
 .rr small{color:var(--mu);grid-column:1/-1}.rr .y{color:#1E7B3E;font-weight:700}.rr .n{color:#B3261E;font-weight:700}
+.ic2 .nx[aria-pressed="true"]{background:#5B5E66;color:#fff;border-color:transparent}
 .emp{text-align:center;padding:40px 16px;color:var(--mu)}
 </style>
 </head>
@@ -1089,8 +1090,8 @@ async function renderMy(){
     return `<article class="ic2" data-id="${i.id}"><div><h3>${esc(i.title)}<span class="tg">${i.status==='published'?'منشورة':'مسودة'}</span></h3><small class="note">${fmt(i.created_at)}</small></div>
 <div class="st"><span><b>${y.length}</b> سيحضرون (${g} شخص)</span><span><b>${n.length}</b> معتذرون</span></div>
 <div class="lkb"><input readonly dir="ltr" value="${esc(l)}" aria-label="رابط الدعوة" onfocus="this.select()"></div>
-<div class="ab"><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح</a><button class="nx" data-m="cp" data-l="${esc(l)}">نسخ الرابط</button><a class="nx dk" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(l)}">واتساب</a><button class="nx" data-m="rs">الردود (${rs.length})</button><button class="nx" data-m="ed">تعديل</button><button class="nx" data-m="rm">حذف</button></div>
-<div class="rl" hidden>${rs.length?rs.map(r=>`<div class="rr"><b>${esc(r.name)}</b><span class="${r.status==='yes'?'y':'n'}">${r.status==='yes'?'سيحضر ('+r.guests+')':'معتذر'}</span>${r.note?`<small>${esc(r.note)}</small>`:''}<small>${fmt(r.created_at)}</small></div>`).join(''):'<p class="note">لا توجد ردود بعد.</p>'}</div></article>`}).join('');
+<div class="ab"><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح</a><button class="nx" data-m="cp" data-l="${esc(l)}">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(l)}">إرسال الرابط بالواتساب</a><button class="nx" data-m="rs" aria-pressed="false">ردود الضيوف (${rs.length})</button><button class="nx" data-m="ed">تعديل</button><button class="nx" data-m="rm">حذف</button></div>
+<div class="rl" hidden><b>ردود الضيوف</b>${rs.length?rs.map(r=>`<div class="rr"><b>${esc(r.name)}</b><span class="${r.status==='yes'?'y':'n'}">${r.status==='yes'?'سيحضر ('+r.guests+')':'معتذر'}</span>${r.note?`<small>${esc(r.note)}</small>`:''}<small>${fmt(r.created_at)}</small></div>`).join(''):'<p class="note">لا توجد ردود بعد.</p>'}</div></article>`}).join('');
 }
 $('#my').addEventListener('click',async e=>{
   const b=e.target.closest('[data-m],[data-a]');if(!b)return;
@@ -1098,7 +1099,7 @@ $('#my').addEventListener('click',async e=>{
   if(b.dataset.a==='myout'){if(sb)await sb.auth.signOut();go('home');return}
   const card=b.closest('.ic2'),id=card&&card.dataset.id,m=b.dataset.m;
   if(m==='cp'){try{await navigator.clipboard.writeText(b.dataset.l);b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
-  else if(m==='rs'){const r=card.querySelector('.rl');r.hidden=!r.hidden}
+  else if(m==='rs'){const r=card.querySelector('.rl');r.hidden=!r.hidden;b.setAttribute('aria-pressed',String(!r.hidden))}
   else if(m==='ed'){b.disabled=true;const r=await sb.from('invitations').select('id,slug,data').eq('id',id).single();b.disabled=false;
     if(r.error||!r.data||!r.data.data||!r.data.data.d){alert('تعذّر فتح الدعوة للتعديل.');return}
     S={t:r.data.data.t,d:r.data.data.d,id:r.data.id,slug:r.data.slug};W={g:1,s:0};cv=S.t==='c';dismissed=true;go('studio')}
