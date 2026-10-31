@@ -123,10 +123,12 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .cust:focus-visible,.rw:focus-visible,.sc:focus-visible,.lk:focus-visible{outline:3px solid var(--gd);outline-offset:2px}
 .inv .pgs{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .inv .pgs::-webkit-scrollbar{display:none}
-.inv .pg{flex:0 0 100%;position:relative;background-size:cover;background-position:center}
+.inv .pg{flex:0 0 auto;position:relative;background-size:cover;background-position:center}
+.inv .pg.first{min-height:100%;display:flex;flex-direction:column}.inv .pg.first .in{flex:1}
+.inv .pg.em{min-height:70%}
 .inv .pg:not(.vis) .in>*{animation-play-state:paused}
 .inv.cu canvas{z-index:2;pointer-events:none}
-.inv .in{padding-bottom:116px}.inv .in .rs{display:none}
+.inv .in .rs{display:none}
 .inv .dg{position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:5px}
 .inv .dg u{width:6px;height:6px;border-radius:3px;background:var(--ac);opacity:.4;transition:height .3s}.inv .dg u.on{opacity:1;height:18px}
 .inv .tb{position:absolute;inset:auto 12px 12px;z-index:4;display:flex;align-items:flex-end;justify-content:space-between;background:color-mix(in srgb,var(--b1) 82%,#fff);border:1.5px solid color-mix(in srgb,var(--ink) 55%,transparent);backdrop-filter:blur(8px);border-radius:20px;padding:8px 6px 6px}
@@ -326,7 +328,8 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 /* invitation */
 .inv{width:360px;height:640px;position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(160deg,var(--b1),var(--b2));color:var(--ink);direction:rtl;box-shadow:0 14px 40px rgba(0,0,0,.25)}
 .inv canvas{position:absolute;inset:0;width:100%;height:100%}
-.inv .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:36px 30px}
+.inv .in{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:16px 30px}
+.inv .pg.first .in{padding:36px 30px 116px}.inv .pg.last .in{padding-bottom:132px}.inv .pg.sec+.pg.sec .in{padding-top:4px}
 .inv .in>*{margin:0;animation:rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*.24s + .15s)}
 .inv.still .in>*{animation:none}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -640,8 +643,8 @@ function inv(d,t){
   if(hs.length)cs.splice(cs.length-1,0,hotelsH);
   if(gp0.length)cs.splice(cs.length-1,0,galH);
   if(pmb)cs.splice(cs.length-1,0,pmH);
-  const pages=Array.from({length:np},(_,i)=>`<div class="pg${i?'':' vis'}"${pg(i)}>${FLW}${cs[i]?`<div class="in">${cs[i]}</div>`:''}</div>`).join('');
-  return `<div class="inv${cu?' cu':''}" style="--b1:${t.b[0]};--b2:${t.b[1]};--ink:${d.tc||t.ink};--ac:${d.tc2||t.ac};font-family:${d.gf||t.f}"><canvas></canvas><div class="pgs">${pages}</div><div class="dg">${'<u></u>'.repeat(np)}</div>${au}${tb}${sheet}${d.hc?'':gal}${sl}</div>`;
+  const pages=Array.from({length:np},(_,i)=>`<div class="pg${i?' sec':' first vis'}${i===np-1?' last':''}${cs[i]?'':' em'}"${pg(i)}>${i===0||i===np-1?FLW:''}${cs[i]?`<div class="in">${cs[i]}</div>`:''}</div>`).join('');
+  return `<div class="inv${cu?' cu':''}" style="--b1:${t.b[0]};--b2:${t.b[1]};--ink:${d.tc||t.ink};--ac:${d.tc2||t.ac};font-family:${d.gf||t.f}"><canvas></canvas><div class="pgs">${pages}</div>${au}${tb}${sheet}${d.hc?'':gal}${sl}</div>`;
 }
 function mount(el,d,t,still){
   el.innerHTML=inv(d,t);
@@ -650,8 +653,8 @@ function mount(el,d,t,still){
   const sp=c.querySelector('.pgs'),dg=c.querySelectorAll('.dg u'),pgs=c.querySelectorAll('.pg');
   if(dg[0])dg[0].classList.add('on');
   sp.addEventListener('scroll',()=>{const k=Math.round(sp.scrollTop/sp.clientHeight);dg.forEach((u,i)=>u.classList.toggle('on',i===k))});
-  if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')}),{root:sp,threshold:.3});pgs.forEach(g=>io.observe(g))}else pgs.forEach(g=>g.classList.add('vis'));
-  if(!still&&!RM){let hold=Date.now()+3000,pos=0;const step=()=>{if(!c.isConnected)return;const m=sp.scrollHeight-sp.clientHeight;if(Math.abs(sp.scrollTop-pos)>2){pos=sp.scrollTop;hold=Date.now()+4000}else if(Date.now()>hold&&pos<m){pos=Math.min(m,pos+.45);sp.scrollTop=pos}requestAnimationFrame(step)};requestAnimationFrame(step)}
+  if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')}),{root:sp,threshold:0,rootMargin:'0px 0px -8% 0px'});pgs.forEach(g=>io.observe(g))}else pgs.forEach(g=>g.classList.add('vis'));
+  if(!still&&!RM){let hold=Date.now()+3000,pos=0,last=performance.now();const step=now=>{if(!c.isConnected)return;const dt=Math.min(64,now-last);last=now;const m=sp.scrollHeight-sp.clientHeight;if(Math.abs(sp.scrollTop-pos)>2){pos=sp.scrollTop;hold=Date.now()+4000}else if(Date.now()>hold&&pos<m){pos=Math.min(m,pos+dt*.03);sp.scrollTop=pos}requestAnimationFrame(step)};requestAnimationFrame(step)}
   tick();
 }
 function tick(){
