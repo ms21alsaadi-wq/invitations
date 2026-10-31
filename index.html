@@ -292,6 +292,7 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .trybtn{width:100%;margin-top:6px;padding:16px;border-radius:16px;border:1px solid color-mix(in srgb,#22C55E 35%,var(--ln));background:color-mix(in srgb,#22C55E 10%,var(--sf));color:#15803D;font:700 16px Tajawal,sans-serif;cursor:pointer}
 .four{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:340px}.four .op.ev.gl{padding:14px;font-size:18px}
 .trybtn:focus-visible{outline:3px solid var(--gd);outline-offset:2px}
+.inv .sht[data-sh="pass"]{max-height:none;overflow:visible}.inv .sht[data-sh="pass"] .pass{padding:34px 14px 12px;gap:4px}.inv .sht[data-sh="pass"] .qrbox{width:150px;height:150px;margin:2px 0}.inv .sht[data-sh="pass"] .qrbox svg{width:150px;height:150px}
 .inv .pass{display:grid;justify-items:center;gap:6px;padding:16px;color:#222}.inv .pass b{font-size:17px}.inv .pass small{color:#777;font-size:12.5px;text-align:center}
 .inv .qrbox{width:170px;height:170px;border:1px solid #eee;border-radius:12px;overflow:hidden;margin:6px 0}.inv .qrbox svg{display:block}
 .inv .pass .sv{margin-top:6px;font-size:13px;color:#1E7B3E;text-decoration:none;border:1px solid #cfe9d6;padding:6px 14px;border-radius:999px}
@@ -374,7 +375,7 @@ button.hb{cursor:pointer}
 .inv .wall{border-top:1px solid #0002;padding-top:10px;display:grid;gap:6px;font-size:13px;color:#222;max-height:150px;overflow:auto}.inv .wall[hidden]{display:none}
 .inv .wall .wr{display:grid;background:#f6f3ec;border-radius:10px;padding:6px 10px}.inv .wall small{color:#555}
 .inv .tkc{display:block;font:700 15px monospace;letter-spacing:.08em;background:#f2efe6;color:#222;border-radius:10px;padding:6px 12px;margin-top:2px;user-select:all;-webkit-user-select:all}.inv .tkc[hidden]{display:none}
-.inv .pact{display:grid;gap:6px;width:100%;margin-top:6px}.inv .pact[hidden]{display:none}
+.inv .pact{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;margin-top:4px}.inv .pact[hidden]{display:none}
 .inv .pact button{font:700 13px Tajawal,sans-serif;padding:9px 10px;border-radius:999px;border:1px solid #d8d2c2;background:#fff;color:#222;cursor:pointer}
 .pcd{width:min(380px,92vw);background:#fff;color:#222;border-radius:24px;padding:24px 20px;display:grid;gap:10px;justify-items:center;text-align:center;font-family:Tajawal,sans-serif;margin:16px 0}
 .pcd h2{margin:0;font:700 22px Amiri,serif;color:#8C6D22}.pcd .pt{font-size:15px;color:#555}.pcd .pn2{font-size:26px;font-weight:700}
@@ -542,7 +543,7 @@ function qrSvg(text,px){const m=qrMatrix(text);if(!m)return '';const n=m.length,
 
 function fdt(v){const x=new Date(v);return isNaN(x)?'':x.toLocaleString('ar-SA-u-ca-gregory',{dateStyle:'medium',timeStyle:'short'})}
 function showPass(inv,name,n,token,quiet){const sh=inv&&inv.querySelector('.sht[data-sh="pass"]');if(!sh)return false;const p=sh.querySelector('.pass'),nm=String(name||'ضيفنا الكريم').slice(0,30),svg=qrSvg(token?('INV1:'+token):[p.dataset.code||'INVITE',nm,n].join('|'),170);
-  const pa=p.querySelector('.pact');if(pa){pa.hidden=!(token&&PUB);if(token&&PUB)p.dataset.pi=JSON.stringify({t:String(token),n:nm,g:n,s:PUB.slug,ti:PUB.title||''})}const tc=p.querySelector('.tkc');if(tc){tc.hidden=!token;tc.innerHTML=token?'رمزك: <bdi dir="ltr">'+String(token).replace(/[^0-9A-Za-z]/g,'')+'</bdi>':''}p.querySelector('.pn').textContent=nm;p.querySelector('.pc').textContent='عدد الحضور: '+n;p.querySelector('.qrbox').innerHTML=svg;p.querySelector('.sv').href='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  const pa=p.querySelector('.pact');if(pa){pa.hidden=!(token&&PUB);if(token&&PUB)p.dataset.pi=JSON.stringify({t:String(token),n:nm,g:n,s:PUB.slug,ti:PUB.title||''})}const tc=p.querySelector('.tkc');if(tc){tc.hidden=!token;tc.innerHTML=token?'رمزك: <bdi dir="ltr">'+String(token).replace(/[^0-9A-Za-z]/g,'')+'</bdi>':''}p.querySelector('.pn').textContent=nm;p.querySelector('.pc').textContent='عدد الحضور: '+n;p.querySelector('.qrbox').innerHTML=svg;p.querySelector('.sv').href='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);p.querySelector('.sv').hidden=!!(token&&PUB);
   if(!quiet){inv.querySelectorAll('.sht').forEach(x=>x.hidden=true);inv.querySelectorAll('.tb .ti').forEach(x=>x.classList.remove('on'));sh.hidden=false}return true}
 function syncNames(d){d.names=d.mode==='c'&&d.n2?d.n1+' & '+d.n2:d.n1}
 function tzT(ds,ts,tz){const[y,m,d]=ds.split('-').map(Number),[h,mi]=ts.split(':').map(Number),g=Date.UTC(y,m-1,d,h,mi);try{const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'}).formatToParts(new Date(g)).reduce((o,p)=>(o[p.type]=+p.value,o),{});return g-(Date.UTC(f.year,f.month-1,f.day,f.hour,f.minute)-g)}catch(_){return new Date(ds+'T'+ts).getTime()}}
@@ -619,7 +620,7 @@ function inv(d,t){
   const wl=(d.wl||[]).filter(w=>w.n);
   if(d.wish&&wl.length)gb.push(`<div class="ctc"><small>قائمة الأمنيات</small>${wl.map(w=>`<div class="wi">${/^data:image\//.test(w.img||'')?`<img src="${w.img}" alt="">`:''}<span>${esc(w.n)}</span>${ok2(w.u)?`<a href="${esc(w.u)}" target="_blank" rel="noopener">عرض</a>`:''}</div>`).join('')}</div>`);
   const giftB=gb.length?gb.join(''):emp('لم تتم إضافة تفاصيل الهدية بعد');
-  const sheet=shell('tel','تواصل',telB)+shell('mus','الموسيقى',musB)+shell('pin','الموقع',pinB)+(d.rsOn===false?'':shell('rs','تأكيد الحضور',rsB))+(d.gift?shell('gift','الهدية',giftB):'')+(d.qe?shell('pass','بطاقة الدخول',`<div class="pass" data-code="${esc(d.qc||'INVITE')}"><b class="pn"></b><small class="pc"></small><div class="qrbox"></div><small>اعرض هذا الرمز عند الدخول</small><code class="tkc" hidden></code><div class="pact" hidden><button type="button" data-pa="img">حفظ البطاقة كصورة</button><button type="button" data-pa="wa">أرسلها لنفسي عبر واتساب</button><button type="button" data-pa="cp">نسخ رابط البطاقة</button></div>${d.qa||d.qb?`<small>صالح ${d.qa?'من '+fdt(d.qa):''} ${d.qb?'إلى '+fdt(d.qb):''}</small>`:''}<a class="sv" download="entry-qr.svg">حفظ الرمز</a></div>`):'');
+  const sheet=shell('tel','تواصل',telB)+shell('mus','الموسيقى',musB)+shell('pin','الموقع',pinB)+(d.rsOn===false?'':shell('rs','تأكيد الحضور',rsB))+(d.gift?shell('gift','الهدية',giftB):'')+(d.qe?shell('pass','بطاقة الدخول',`<div class="pass" data-code="${esc(d.qc||'INVITE')}"><b class="pn"></b><small class="pc"></small><div class="qrbox"></div><small>اعرض هذا الرمز عند الدخول</small><code class="tkc" hidden></code><div class="pact" hidden><button type="button" data-pa="img">حفظ البطاقة كصورة</button><button type="button" data-pa="cp">نسخ رابط البطاقة</button></div>${d.qa||d.qb?`<small>صالح ${d.qa?'من '+fdt(d.qa):''} ${d.qb?'إلى '+fdt(d.qb):''}</small>`:''}<a class="sv" download="entry-qr.svg">حفظ الرمز</a></div>`):'');
   const tb=`<div class="tb${d.gift?' six':''}" style="--ti:${d.ic||'var(--ink)'};--tt:${d.tt||'var(--ink)'}">${ti('tel','تواصل','tel')}${ti('mus','موسيقى','mus')}${d.hc?'':`<button class="cam" aria-label="الكاميرا">${sv(I.cam)}</button>`}${ti('pin','الموقع','pin')}${d.rsOn===false?'':ti('rs','تأكيد الحضور','hrt')}${d.gift?ti('gift','هدية','gift'):''}</div>`;
   const gp=(d.gallery||[]).filter(u=>/^data:image\//.test(u)),gi=[...gp,...(d.bgs||[]).filter(Boolean),d.nimg].filter(Boolean);
   const gal=`<div class="gal cam2" hidden data-hs="${d.hs?1:0}" data-hg="${d.hg?1:0}"><button class="gx" aria-label="إغلاق">×</button><h3>📸 الكاميرا</h3><label class="snap">📷 التقاط صورة<input type="file" accept="image/*" capture="environment" hidden></label><p class="hint2">${d.hg?'الصور الملتقطة لا تظهر في الدعوة':'صورك الملتقطة تظهر هنا'}</p><div class="gg"></div></div>`;
@@ -1138,8 +1139,7 @@ document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-pa]');if(!b)return;e.stopPropagation();
   const box=b.closest('[data-pi]');let i;try{i=JSON.parse(box.dataset.pi)}catch(_){return}
   const old=b.textContent,flash=t=>{b.textContent=t;setTimeout(()=>{b.textContent=old},2200)};
-  if(b.dataset.pa==='wa'){window.open('https://wa.me/?text='+encodeURIComponent('بطاقة دخولي'+(i.ti?' لـ «'+i.ti+'»':'')+':\n'+passUrl(i)),'_blank','noopener')}
-  else if(b.dataset.pa==='cp'){try{await navigator.clipboard.writeText(passUrl(i));flash('تم النسخ ✓')}catch(_){flash('انسخ يدوياً')}}
+  if(b.dataset.pa==='cp'){try{await navigator.clipboard.writeText(passUrl(i));flash('تم النسخ ✓')}catch(_){flash('انسخ يدوياً')}}
   else if(b.dataset.pa==='img'){b.disabled=true;let ok=false;try{ok=await savePassImg(i)}catch(_){}b.disabled=false;flash(ok?'تم ✓':'تعذّر الحفظ')}
 },true);
 async function bootPass(){
@@ -1149,7 +1149,7 @@ async function bootPass(){
   if(!/^[0-9A-F]{12}$/.test(tok)){box.innerHTML='<p class="pm">رابط البطاقة غير صحيح.</p>';return}
   let ti='';if(sb&&sl){try{const r=await sb.rpc('get_invitation',{p_slug:sl});ti=(r.data&&r.data.title)||''}catch(_){}}
   const i={t:tok,n:nm,g,s:sl,ti};
-  box.innerHTML=`<div class="pcd" data-pi="${esc(JSON.stringify(i))}"><h2>بطاقة الدخول</h2>${ti?`<div class="pt">${esc(ti)}</div>`:''}<div class="pn2">${esc(nm)}</div><div class="pt">عدد الحضور: ${g}</div><div class="pq">${qrSvg('INV1:'+tok,220)}</div><div class="pk">${tok}</div><small>اعرض هذا الرمز عند الدخول، ولا تشاركه مع أحد</small><div class="pact"><button type="button" data-pa="img">حفظ البطاقة كصورة</button><button type="button" data-pa="wa">أرسلها لنفسي عبر واتساب</button>${sl?`<a href="${esc(location.pathname+'?i='+sl)}">فتح الدعوة</a>`:''}</div></div>`;
+  box.innerHTML=`<div class="pcd" data-pi="${esc(JSON.stringify(i))}"><h2>بطاقة الدخول</h2>${ti?`<div class="pt">${esc(ti)}</div>`:''}<div class="pn2">${esc(nm)}</div><div class="pt">عدد الحضور: ${g}</div><div class="pq">${qrSvg('INV1:'+tok,220)}</div><div class="pk">${tok}</div><small>اعرض هذا الرمز عند الدخول، ولا تشاركه مع أحد</small><div class="pact"><button type="button" data-pa="img">حفظ البطاقة كصورة</button>${sl?`<a href="${esc(location.pathname+'?i='+sl)}">فتح الدعوة</a>`:''}</div></div>`;
 }
 /* scanner (staff) */
 function loadScript(u){return new Promise((res,rej)=>{const e=document.createElement('script');e.src=u;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
