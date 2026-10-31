@@ -126,6 +126,7 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .inv .pg{flex:0 0 auto;position:relative;background-size:cover;background-position:center}
 .inv .pg.first{min-height:100%;display:flex;flex-direction:column}.inv .pg.first .in{flex:1}
 .inv .pg.em{min-height:70%}
+.inv .byb{display:grid;gap:3px;justify-items:center;font-size:13px;opacity:.85}.inv .byb::before{content:"";width:64px;height:1px;background:var(--ac);margin-bottom:10px}.inv .byb a,.inv .byb b{color:var(--ac);font-size:16px;font-weight:700;text-decoration:none}
 .inv .pg:not(.vis) .in>*{animation-play-state:paused}
 .inv.cu canvas{z-index:2;pointer-events:none}
 .inv .in .rs{display:none}
@@ -600,7 +601,9 @@ function inv(d,t){
   const galH=`<div class="prg gal2" style="--i:0"><h3>معرض الصور</h3><div class="gr">${gp0.map(u=>`<img src="${u}" alt="">`).join('')}</div></div>`;
   const pmb=(d.pmB||'').trim();
   const pmH=`<div class="prg pm${pmb.length>220?' dn':''}" style="--i:0"><h3>${esc(d.pmT||'رسالة شخصية')}</h3><p class="pb">${esc(pmb)}</p>${d.pmS?`<p class="ps">${esc(d.pmS)}</p>`:''}</div>`;
-  const L=[0,1,2,3,4].filter(i=>bg[i]).pop(),np=Math.max(3+(prog.length?1:0)+(rl.length?1:0)+(dcs.length?1:0)+(hs.length?1:0)+(gp0.length?1:0)+(pmb?1:0),(L===undefined?-1:L)+1);
+  const by=d.by!==false,byn=(d.byn||'').trim().slice(0,40),site=location.origin+location.pathname.replace(/index\.html$/,'');
+  const byH=`<div class="byb" style="--i:0"><small>صُمّمت هذه الدعوة بواسطة</small>${byn?`<b>${esc(byn)}</b>`:`<a href="${esc(site)}" target="_blank" rel="noopener">دعواتي</a>`}</div>`;
+  const L=[0,1,2,3,4].filter(i=>bg[i]).pop(),np=Math.max(3+(by?1:0)+(prog.length?1:0)+(rl.length?1:0)+(dcs.length?1:0)+(hs.length?1:0)+(gp0.length?1:0)+(pmb?1:0),(L===undefined?-1:L)+1);
   const sv=q=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${q}</svg>`;
   const I={tel:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',mus:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',pin:'<path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',hrt:'<path d="M12 20s-8-4.8-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.2 12 20 12 20z"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v9h14v-9M12 8C9.5 8 8 7 8 5.5S9.5 3 12 8c2.5-5 4-3.5 4-2.5S14.5 8 12 8z"/>'};
   const ti=(k,lab,ic)=>`<button class="ti" data-sh="${k}"><i>${sv(I[ic])}</i><small>${lab}</small></button>`;
@@ -643,6 +646,7 @@ function inv(d,t){
   if(hs.length)cs.splice(cs.length-1,0,hotelsH);
   if(gp0.length)cs.splice(cs.length-1,0,galH);
   if(pmb)cs.splice(cs.length-1,0,pmH);
+  if(by)cs.push(byH);
   const pages=Array.from({length:np},(_,i)=>`<div class="pg${i?' sec':' first vis'}${i===np-1?' last':''}${cs[i]?'':' em'}"${pg(i)}>${i===0||i===np-1?FLW:''}${cs[i]?`<div class="in">${cs[i]}</div>`:''}</div>`).join('');
   return `<div class="inv${cu?' cu':''}" style="--b1:${t.b[0]};--b2:${t.b[1]};--ink:${d.tc||t.ink};--ac:${d.tc2||t.ac};font-family:${d.gf||t.f}"><canvas></canvas><div class="pgs">${pages}</div>${au}${tb}${sheet}${d.hc?'':gal}${sl}</div>`;
 }
@@ -912,7 +916,9 @@ ${d.qe?`<button class="trybtn" data-a="qtry">✨ جرّب كيف يستقبل ض
 {t:'إعدادات إضافية',q:'اقتربنا من النهاية! تفضيلات أخيرة؟ 🎨',b:()=>{const d=S.d,fo=v=>FONTS.map(([l,f])=>`<option value="${f}"${v===f?' selected':''}>${l}</option>`).join('');
   return `<div class="imgc" style="margin-top:0"><label style="margin:0">خط النص العام<select data-k="gf"><option value="">افتراضي (حسب القالب)</option>${fo(d.gf)}</select></label><div class="pvb" id="pv-g"></div>
 <label>خط اسم الظرف<select data-k="ef"><option value="">افتراضي</option>${fo(d.ef)}</select></label><div class="pvb g" id="pv-e"></div>
-<div class="rowt"><div><span>عرض الظرف عند فتح الدعوة</span><small>تظهر دائرة بأسماء العروسين ويضغط الضيف لفتح الدعوة</small></div><button class="sw2" role="switch" aria-checked="${d.env!==false}" aria-label="عرض الظرف عند فتح الدعوة" data-a="tgo" data-t="env"></button></div></div>`}},
+<div class="rowt"><div><span>عرض الظرف عند فتح الدعوة</span><small>تظهر دائرة بأسماء العروسين ويضغط الضيف لفتح الدعوة</small></div><button class="sw2" role="switch" aria-checked="${d.env!==false}" aria-label="عرض الظرف عند فتح الدعوة" data-a="tgo" data-t="env"></button></div>
+<div class="rowt"><div><span>توقيع «صُمّمت هذه الدعوة بواسطة»</span><small>يظهر في آخر الدعوة</small></div><button class="sw2" role="switch" aria-checked="${d.by!==false}" aria-label="توقيع صُمّمت هذه الدعوة بواسطة" data-a="tgo" data-t="by"></button></div>
+<label>اسم الموقّع (اختياري)<input type="text" data-k="byn" maxlength="40" value="${esc(d.byn)}" placeholder="اتركه فارغاً لعرض «دعواتي»"></label></div>`}},
 {t:'مراجعة وختم',q:'كل شيء يبدو رائعاً! دعوتك جاهزة للختم. ✉️',b:()=>{const d=S.d,dt=new Date(d.date+'T'+(d.time||'00:00')),ok=!isNaN(dt);
   const row=(ic,l,v)=>v?`<div class="sr"><span class="si" data-ic="${ic}"></span><div><small>${l}</small><b>${esc(v)}</b></div></div>`:'';
   const pn=d.showProg===false?0:(d.prog||[]).filter(x=>x.t).length,rn=d.showRules===false?0:(d.rules||[]).length;
