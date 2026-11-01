@@ -374,6 +374,7 @@ button.hb{cursor:pointer}
 .rr small{color:var(--mu);grid-column:1/-1}.dl{border:0;background:none;color:#B3261E;font-size:16px;cursor:pointer;padding:2px 6px}.pi{position:relative}.pi .dl{position:absolute;top:4px;inset-inline-start:4px;background:rgba(255,255,255,.92);border-radius:50%;width:26px;height:26px;padding:0;line-height:26px}.rr .y{color:#1E7B3E;font-weight:700}.rr .n{color:#B3261E;font-weight:700}
 .ic2 .nx[aria-pressed="true"]{background:#5B5E66;color:#fff;border-color:transparent}
 .rl[hidden],.pl[hidden]{display:none}
+.am.lk{background:var(--bg)}
 .pl{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;border-top:1px solid var(--ln);padding-top:12px}
 .pl b{grid-column:1/-1}.pl a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--ln);aspect-ratio:1}.pl img{width:100%;height:100%;object-fit:cover;display:block}
 .inv .wall{border-top:1px solid #0002;padding-top:10px;display:grid;gap:6px;font-size:13px;color:#222;max-height:150px;overflow:auto}.inv .wall[hidden]{display:none}
@@ -458,6 +459,8 @@ button.hb{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 const SCANSLUG=new URLSearchParams(location.search).get('scan'),PASSTOK=new URLSearchParams(location.search).get('pass'),PUBSLUG=new URLSearchParams(location.search).get('i')||SCANSLUG||(PASSTOK?'pass':null);let PUB=null,user=null,afterAuth=null,sb=null;
+const LOCKED=true;/* true = الموقع خاص بالمالك فقط (روابط الدعوات والبطاقات والماسح تبقى مفتوحة للضيوف) */
+const isLocked=()=>LOCKED&&!PUBSLUG;
 const T=[
 {n:'ليالي الذهب',b:['#14262B','#0B1719'],ink:'#F3EBDD',ac:'#D6B15E',f:'Amiri,serif',fx:'stars',ev:'wedding',names:'ليلى وعمر'},
 {n:'ورد الفجر',b:['#F7E4E0','#EBC4C0'],ink:'#4A2530',ac:'#A8404F',f:'Amiri,serif',fx:'petals',ev:'engage',names:'نورة وفيصل'},
@@ -1049,7 +1052,7 @@ const arErr=e=>{const m=String((e&&e.message)||e||'');
 let amode='in';
 function setMode(m){amode=m;$('#amt').textContent=m==='in'?'تسجيل الدخول':'إنشاء حساب';$('#amg').textContent=m==='in'?'دخول':'إنشاء الحساب';$('#amsw').textContent=m==='in'?'ليس لديك حساب؟ أنشئ حساباً':'لديك حساب؟ سجّل الدخول';$('#apw').autocomplete=m==='in'?'current-password':'new-password'}
 const amsg=(t,ok)=>{const x=$('#amm');x.textContent=t||'';x.className='amm'+(ok?' ok':'')};
-function closeAuth(){const o=$('#am');if(o)o.hidden=true}
+function closeAuth(f){if(!f&&isLocked()&&!user)return;const o=$('#am');if(o)o.hidden=true}
 function openAuth(cb){afterAuth=cb||null;let o=$('#am');
   if(!o){o=document.createElement('div');o.id='am';o.className='am';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
     o.innerHTML='<form class="amc" novalidate><button type="button" class="amx" aria-label="إغلاق">×</button><h3 id="amt"></h3><label>البريد الإلكتروني<input type="email" id="aem" autocomplete="email" dir="ltr"></label><label>كلمة المرور<input type="password" id="apw" dir="ltr"></label><p class="amm" id="amm" role="status"></p><button class="nx dk" type="submit" id="amg" style="justify-content:center"></button><button type="button" class="lk" id="amsw"></button></form>';
@@ -1066,13 +1069,17 @@ function openAuth(cb){afterAuth=cb||null;let o=$('#am');
       b.disabled=false;
       if(r.error)return amsg(arErr(r.error));
       if(amode==='up'&&!(r.data&&r.data.session)){setMode('in');return amsg('تم إنشاء الحساب. افتح بريدك واضغط رابط التأكيد ثم سجّل الدخول.',1)}
-      closeAuth();const cb=afterAuth;afterAuth=null;if(cb)cb()});
+      closeAuth(true);const cb=afterAuth;afterAuth=null;if(cb)cb()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuth()})}
-  setMode('in');amsg('');o.hidden=false;$('#aem').focus()}
+  const lk=isLocked();o.classList.toggle('lk',lk);o.querySelector('.amx').hidden=lk;$('#amsw').hidden=lk;
+  setMode('in');if(lk)$('#amt').textContent='دخول المالك';amsg('');o.hidden=false;$('#aem').focus()}
+function lockApp(on){document.querySelector('header').style.display=on?'none':'';document.querySelector('main').style.display=on?'none':''}
+function gate(){lockApp(true);if(!sb){document.body.insertAdjacentHTML('beforeend','<p class="pm" id="lkmsg" style="color:var(--tx)">الخدمة غير متاحة حالياً.</p>');return}openAuth(()=>{lockApp(false);go('home')})}
 function updAcc(){const l=$('#accL');if(l)l.textContent=user?'دعواتي':'حسابي'}
 if(sb){
-  sb.auth.getSession().then(({data})=>{user=(data.session&&data.session.user)||null;updAcc()});
-  sb.auth.onAuthStateChange((ev,ses)=>{user=(ses&&ses.user)||null;updAcc();if(ev==='SIGNED_OUT'&&!$('#my').hidden)go('home')})}
+  sb.auth.getSession().then(({data})=>{user=(data.session&&data.session.user)||null;updAcc();if(isLocked()){if(user){lockApp(false);closeAuth(true)}else gate()}});
+  sb.auth.onAuthStateChange((ev,ses)=>{user=(ses&&ses.user)||null;updAcc();if(ev==='SIGNED_OUT'){if(isLocked())gate();else if(!$('#my').hidden)go('home')}})}
+if(isLocked()){lockApp(true);if(!sb)gate()}
 $('#acc').addEventListener('click',()=>{if(user)go('my');else openAuth(()=>go('my'))});
 /* publish */
 function pubBox(){const l=S.slug?pubUrl(S.slug):'';
