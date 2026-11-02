@@ -56,6 +56,7 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}
 .card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .card b{font-size:17px}.card small{color:var(--mu)}
+.inv.story .pg{padding-bottom:290px}.inv.story .pg.em{min-height:300px}.inv .stsc{position:absolute;left:0;bottom:0;width:100%;height:300px;pointer-events:none;z-index:0}.inv.story .pg .in{position:relative;z-index:1}.inv.story .thx{color:var(--ink);opacity:.85}
 .cf{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.cf button{border:1px solid var(--ln);background:var(--sf);color:var(--tx,inherit);border-radius:999px;padding:7px 15px;font:inherit;font-size:14px;cursor:pointer}.cf button[aria-pressed=true]{background:var(--ac,#B8923A);color:#fff;border-color:transparent}
 .card[hidden]{display:none}.card>.tcode{font-size:11px;letter-spacing:1px;color:var(--mu);direction:ltr}.card .ac2{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.btn.ghost{background:none;color:inherit;border:1px solid var(--ln)}
 .pvm{position:fixed;inset:0;z-index:60;background:rgba(10,10,14,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}.pvm[hidden]{display:none}.pvm .pvs{width:360px;height:640px;position:relative;border-radius:28px;overflow:hidden;direction:ltr}.pvm .row{display:flex;gap:10px}
@@ -492,8 +493,79 @@ const T=[
 {n:'بتلة صغيرة',b:['#FDEAF0','#F7CFDC'],ink:'#5D3042',ac:'#D1648A',f:'Tajawal,sans-serif',fx:'petals',ev:'aqiqa',names:'لجين'},
 {n:'قبعة الذهب',b:['#16161A','#0A0A0C'],ink:'#F6F1E4',ac:'#E0B94F',f:"'Reem Kufi',sans-serif",fx:'confetti',ev:'grad',names:'عبدالرحمن'},
 {n:'مستقبل مشرق',b:['#0F4C55','#093038'],ink:'#EBFBF8',ac:'#FFC857',f:'Tajawal,sans-serif',fx:'sparkle',ev:'grad',names:'أروى'},
-{n:'حفلة الألوان',b:['#FFFFFF','#F2EAFB'],ink:'#2E2A4A',ac:'#7A4FE0',f:"'Reem Kufi',sans-serif",fx:'confetti',ev:'bday',names:'سلطان'}
+{n:'حفلة الألوان',b:['#FFFFFF','#F2EAFB'],ink:'#2E2A4A',ac:'#7A4FE0',f:"'Reem Kufi',sans-serif",fx:'confetti',ev:'bday',names:'سلطان'},
+{n:'قصة العمر',b:['#D3EAE8','#B5D6D5'],ink:'#1E3A3F',ac:'#3F7479',f:'Amiri,serif',fx:'hearts',ev:'wedding',names:'نوف وعبدالعزيز',story:'teal'},
+{n:'قصة العمر · رملي',b:['#FBEBD3','#F0D0A8'],ink:'#4A2E20',ac:'#B0713F',f:'Amiri,serif',fx:'petals',ev:'wedding',names:'العنود وماجد',story:'sand'}
 ];
+/* ===== قصة العمر: مشاهد مرسومة بالفرشاة ===== */
+const STORY={
+ teal:{ink:'#24464B',tint:'#86B7B7',paper:'#F4FBFA'},
+ sand:{ink:'#5A3A2A',tint:'#D9A97C',paper:'#FFF8EE'}
+};
+function storySvg(k,P){
+ const ink=P.ink,tint=P.tint,paper=P.paper,gy=288;
+ const arm=(h,sd,col,w)=>`<path d="M${sd*24} -142 Q${sd*38} ${(h[1]-142)/2-6} ${h[0]} ${h[1]}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+ const hand=h=>`<circle cx="${h[0]}" cy="${h[1]}" r="5.5" fill="${paper}" stroke="${ink}" stroke-width="2.4"/>`;
+ const G=(x,s,f,L,R)=>{L=L||[-38,-62];R=R||[38,-62];
+  return `<g transform="translate(${x} ${gy}) scale(${f*s} ${s})">${arm(L,-1,ink,13)}${arm(R,1,ink,13)}${hand(L)}${hand(R)}
+  <path d="M-22 -150C-34 -142 -37 -100 -36 -60L-41 0H41L36 -60C37 -100 34 -142 22 -150C12 -154 -12 -154 -22 -150Z" fill="${ink}"/>
+  <path d="M-7 -151L0 -134L7 -151M0 -134V-66M-23 -148C-31 -108 -31 -50 -35 -4M23 -148C31 -108 31 -50 35 -4" fill="none" stroke="${paper}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+  <circle cx="0" cy="-120" r="1.6" fill="${paper}"/><circle cx="0" cy="-104" r="1.6" fill="${paper}"/><circle cx="0" cy="-88" r="1.6" fill="${paper}"/>
+  <path d="M-21 -170C-23 -200 23 -200 21 -170C29 -160 31 -146 24 -137C12 -142 -12 -142 -24 -137C-31 -146 -29 -160 -21 -170Z" fill="${paper}" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M-22 -150C-18 -144 -16 -141 -12 -139M22 -150C18 -144 16 -141 12 -139" stroke="${ink}" stroke-width="1.6" fill="none" opacity=".6"/>
+  <ellipse cx="0" cy="-167" rx="12" ry="15" fill="${paper}" stroke="${ink}" stroke-width="2"/>
+  <path d="M-21 -187C-8 -194 8 -194 21 -187" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-22 -181C-8 -188 8 -188 22 -181" stroke="${ink}" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>`};
+ const B=(x,s,f,L,R,bq)=>{L=L||[-30,-66];R=R||[30,-66];
+  const a=(h,sd)=>`<path d="M${sd*14} -146Q${sd*30} ${(h[1]-146)/2-4} ${h[0]} ${h[1]}" stroke="${ink}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M${sd*14} -146Q${sd*30} ${(h[1]-146)/2-4} ${h[0]} ${h[1]}" stroke="${paper}" stroke-width="6.4" fill="none" stroke-linecap="round"/>`;
+  const q=bq?`<g transform="translate(${bq[0]} ${bq[1]})"><path d="M0 0L-4 26M0 0L4 26" stroke="${ink}" stroke-width="2.4" fill="none"/>${[[0,-8,7],[-8,-3,6],[8,-3,6],[-4,-13,5.5],[5,-13,5.5]].map(c=>`<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="${tint}" stroke="${ink}" stroke-width="2"/>`).join('')}</g>`:'';
+  return `<g transform="translate(${x} ${gy}) scale(${f*s} ${s})">
+  <path d="M-11 -192C-42 -150 -48 -70 -60 -2L-24 -2C-22 -70 -16 -140 7 -190Z" fill="${tint}" fill-opacity=".55" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M-15 -112C-26 -70 -52 -22 -68 0H68C52 -22 26 -70 15 -112Z" fill="${paper}" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M0 -104C-4 -64 -10 -30 -18 -2M12 -100C16 -64 30 -30 44 -2M-12 -100C-22 -64 -40 -30 -52 -2" stroke="${ink}" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/>
+  <path d="M-14 -148C-16 -135 -15 -122 -15 -112H15C15 -122 16 -135 14 -148Z" fill="${paper}" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M-15 -113H15" stroke="${ink}" stroke-width="6.5"/>
+  ${a(L,-1)}${a(R,1)}${hand(L)}${hand(R)}${q}
+  <ellipse cx="0" cy="-168" rx="12.5" ry="15.5" fill="${paper}" stroke="${ink}" stroke-width="2.2"/>
+  <path d="M-13.5 -170C-15 -192 15 -192 13.5 -170C9 -180 -9 -180 -13.5 -170Z" fill="${ink}"/><circle cx="0" cy="-194" r="7.5" fill="${ink}"/>
+  <path d="M-12 -186C-30 -160 -34 -110 -38 -60" stroke="${ink}" stroke-width="2" fill="none" opacity=".55"/></g>`};
+ const heart=(cx,cy,s,fill,op,st)=>`<path transform="translate(${cx} ${cy}) scale(${s})" d="M0 36C-70 -4 -46 -62 0 -26C46 -62 70 -4 0 36Z" fill="${fill}" fill-opacity="${op}" ${st||''} stroke-linejoin="round"/>`;
+ const star=(x,y,r,o)=>`<path d="M${x} ${y-r}Q${x} ${y} ${x+r} ${y}Q${x} ${y} ${x} ${y+r}Q${x} ${y} ${x-r} ${y}Q${x} ${y} ${x} ${y-r}Z" fill="${ink}" opacity="${o||.55}"/>`;
+ const ground=`<path d="M-6 ${gy+2}C50 ${gy-8} 110 ${gy+8} 180 ${gy+1}S300 ${gy-6} 366 ${gy+2}" stroke="${ink}" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M20 ${gy+8}C70 ${gy+3} 120 ${gy+12} 170 ${gy+8}M210 ${gy+9}C260 ${gy+4} 300 ${gy+11} 340 ${gy+7}" stroke="${ink}" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".5"/>`;
+ let o='';
+ if(k===0){
+  o=heart(180,118,.8,tint,.5)+`<path d="M122 92Q180 20 238 92" stroke="${ink}" stroke-width="2.2" fill="none" stroke-dasharray="1 7" stroke-linecap="round" opacity=".7"/>`+
+   G(84,.82,1,null,[44,-92])+B(276,.82,-1,null,[40,-84],[48,-84])+star(40,70,7)+star(320,52,6)+star(180,36,5,.4)+star(300,150,4,.4);
+ }else if(k===1){
+  o=heart(180,150,3.3,tint,.42)+G(112,.96,1,null,[66,-100])+B(258,.96,-1,null,[66,-96])+
+   `<g transform="translate(185 188)"><rect x="-12" y="0" width="24" height="16" rx="3" fill="${ink}"/><path d="M-12 6H12" stroke="${paper}" stroke-width="1.5"/><circle cx="0" cy="-4" r="6.5" fill="none" stroke="${ink}" stroke-width="3"/><path d="M-3 -12L0 -17L3 -12L0 -9Z" fill="${paper}" stroke="${ink}" stroke-width="1.8"/></g>`+
+   star(184,150,8,.7)+star(150,140,4,.5)+star(220,136,5,.5)+star(100,70,6,.4)+star(270,80,7,.4);
+ }else if(k===2){
+  const fing=[[148,84],[166,66],[184,62],[202,76]];
+  o=`<path d="M278 52A34 34 0 1 0 306 100A27 27 0 1 1 278 52Z" fill="${tint}" opacity=".9"/>`+star(240,60,6)+star(320,130,5)+star(60,50,5)+
+   `<path d="M70 20V70" stroke="${ink}" stroke-width="2"/><path d="M60 70H80L84 82V112C84 120 56 120 56 112V82Z" fill="${tint}" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/><path d="M70 120V132" stroke="${ink}" stroke-width="2"/>`+
+   `<g stroke-linecap="round" stroke-linejoin="round"><path d="M142 204Q108 200 106 158" stroke="${ink}" stroke-width="22" fill="none"/><path d="M142 204Q108 200 106 158" stroke="${paper}" stroke-width="17.5" fill="none"/>`+
+   fing.map(f=>`<path d="M${f[0]} 160V${f[1]}" stroke="${ink}" stroke-width="22" fill="none"/>`).join('')+
+   `<rect x="136" y="132" width="80" height="96" rx="24" fill="${ink}"/>`+
+   fing.map(f=>`<path d="M${f[0]} 160V${f[1]}" stroke="${paper}" stroke-width="17.5" fill="none"/>`).join('')+
+   `<rect x="139" y="135" width="74" height="90" rx="21" fill="${paper}"/></g>`+
+   `<g fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"><circle cx="176" cy="180" r="5" fill="${ink}"/>`+
+   Array.from({length:8},(_,i)=>{const a=i*Math.PI/4;return `<ellipse cx="${176+Math.cos(a)*15}" cy="${180+Math.sin(a)*15}" rx="7" ry="3.2" transform="rotate(${i*45} ${176+Math.cos(a)*15} ${180+Math.sin(a)*15})"/>`}).join('')+
+   `<circle cx="176" cy="180" r="27" stroke-dasharray="1 5"/>`+fing.map(f=>`<path d="M${f[0]} ${f[1]+14}V150" stroke-dasharray="1 5"/>`).join('')+
+   `<path d="M150 216Q176 204 202 216" /><path d="M146 150Q176 140 206 150"/></g>`+
+   `<path d="M132 226H220L232 ${gy}H120Z" fill="${ink}"/><path d="M128 252H224M126 266H226" stroke="${paper}" stroke-width="1.6" opacity=".6"/>`+
+   heart(268,222,.7,tint,.55)+heart(96,236,.5,tint,.5);
+ }else if(k===3){
+  const fl=Array.from({length:13},(_,i)=>{const a=Math.PI+i*Math.PI/12,x=180+110*Math.cos(a),y=150+110*Math.sin(a);return `<g><circle cx="${x}" cy="${y}" r="${i%2?5:7.5}" fill="${i%2?tint:paper}" stroke="${ink}" stroke-width="2"/>${i%2?'':`<circle cx="${x}" cy="${y}" r="2.4" fill="${ink}"/>`}</g>`}).join('');
+  o=`<path d="M70 ${gy}V150A110 110 0 0 1 290 150V${gy}" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M82 ${gy}V152A98 98 0 0 1 278 152V${gy}" stroke="${tint}" stroke-width="3" fill="none" opacity=".7"/>`+fl+
+   `<path d="M70 230q-14 -6 -20 -18q16 0 20 18M290 230q14 -6 20 -18q-16 0 -20 18M70 196q-14 -6 -20 -18q16 0 20 18M290 196q14 -6 20 -18q-16 0 -20 18" fill="${ink}" opacity=".75"/>`+
+   G(150,.78,1,null,[46,-72])+B(214,.78,1,[-46,-72],null)+heart(180,38,.35,ink,.7)+star(40,60,6)+star(322,70,5)+star(120,40,4,.4);
+ }else{
+  o=heart(180,150,3.7,tint,.55)+G(206,1.02,-1,[-38,-70],[30,-100])+B(154,1.02,1,[-26,-86],[30,-96],[40,-108])+
+   Array.from({length:14},(_,i)=>`<ellipse cx="${20+(i*53)%330}" cy="${20+(i*37)%200}" rx="6" ry="3" transform="rotate(${i*37} ${20+(i*53)%330} ${20+(i*37)%200})" fill="${ink}" opacity=".35"/>`).join('')+star(50,60,7)+star(316,44,8)+star(330,150,5,.4);
+ }
+ return `<svg class="stsc" viewBox="0 0 360 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><defs><filter id="bz" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></defs><g filter="url(#bz)">${o}${ground}</g></svg>`;
+}
+
 const CATS=[['wedding','زفاف','W'],['engage','خطوبة','E'],['henna','حنّاء','H'],['bridal','حفلة العروس','S'],['gender','كشف الجنس','R'],['baby','مواليد','B'],['grad','تخرج','G'],['bday','عيد ميلاد','D'],['other','أخرى','X']];
 const evCat=e=>({wedding:'wedding',nikah:'wedding',engage:'engage',henna:'henna',bridal:'bridal',gender:'gender',aqiqa:'baby',grad:'grad',bday:'bday'}[e]||'other');
 (()=>{const c={};T.forEach(t=>{t.cat=evCat(t.ev);c[t.cat]=(c[t.cat]||0)+1;t.code=CATS.find(x=>x[0]===t.cat)[2]+String(c[t.cat]).padStart(2,'0')})})();
@@ -668,7 +740,7 @@ function inv(d,t){
   const gp=(d.gallery||[]).filter(u=>/^data:image\//.test(u)),gi=[...gp,...(d.bgs||[]).filter(Boolean),d.nimg].filter(Boolean);
   const gal=`<div class="gal cam2" hidden data-hs="${d.hs?1:0}" data-hg="${d.hg?1:0}"><button class="gx" aria-label="إغلاق">×</button><h3>📸 الكاميرا</h3><label class="snap">📷 التقاط صورة<input type="file" accept="image/*" capture="environment" hidden></label><p class="hint2">${d.hg?'الصور الملتقطة لا تظهر في الدعوة':'صورك الملتقطة تظهر هنا'}</p><div class="gg"></div></div>`;
   const au=msrc?`<audio class="au" src="${esc(msrc)}" loop data-off="${(+d.mh||0)*3600+(+d.mm||0)*60+(+d.ms||0)}" data-auto="${d.mauto===false?0:1}"></audio>`:'';
-  const FLW=cu?'':florals();
+  const FLW=cu||t.story?'':florals();
   const envN=d.mode==='c'&&d.n2?[d.n1,'&',d.n2]:[d.names||d.n1||''];
   const sl=d.env===false?'':`<button class="sl" aria-label="افتح الدعوة">${d.seal?`<span class="sbd"><img src="${d.seal}" alt=""></span><small class="sop">افتح</small>`:`<span class="sbd" style="${d.ef?`font-family:${d.ef}`:''}">${envN.map(x=>`<i>${esc(x)}</i>`).join('')}<small>افتح</small></span>`}</button>`;
   const sg=d.sg?(d.sg[0]==='u'?{img:(d.myArt||[])[+d.sg.slice(1)]}:SGS.find(x=>x.id===d.sg)):null;
@@ -684,8 +756,9 @@ function inv(d,t){
   if(gp0.length)cs.splice(cs.length-1,0,galH);
   if(pmb)cs.splice(cs.length-1,0,pmH);
   if(by)cs.push(byH);
-  const pages=Array.from({length:np},(_,i)=>`<div class="pg${i?' sec':' first vis'}${i===np-1?' last':''}${cs[i]?'':' em'}"${pg(i)}>${i===0||i===np-1?FLW:''}${cs[i]?`<div class="in">${cs[i]}</div>`:''}</div>`).join('');
-  return `<div class="inv${cu?' cu':''}" style="--b1:${t.b[0]};--b2:${t.b[1]};--ink:${d.tc||t.ink};--ac:${d.tc2||t.ac};font-family:${d.gf||t.f}"><canvas></canvas><div class="pgs">${pages}</div>${au}${tb}${sheet}${d.hc?'':gal}${sl}</div>`;
+  const SP=t.story?STORY[t.story]:null,sck=i=>np<2?0:Math.round(i*4/(np-1));
+  const pages=Array.from({length:np},(_,i)=>`<div class="pg${i?' sec':' first vis'}${i===np-1?' last':''}${cs[i]?'':' em'}"${pg(i)}>${i===0||i===np-1?FLW:''}${cs[i]?`<div class="in">${cs[i]}</div>`:''}${SP?storySvg(sck(i),SP):''}</div>`).join('');
+  return `<div class="inv${cu?' cu':''}${t.story?' story':''}" style="--b1:${t.b[0]};--b2:${t.b[1]};--ink:${d.tc||t.ink};--ac:${d.tc2||t.ac};font-family:${d.gf||t.f}"><canvas></canvas><div class="pgs">${pages}</div>${au}${tb}${sheet}${d.hc?'':gal}${sl}</div>`;
 }
 function mount(el,d,t,still){
   el.innerHTML=inv(d,t);
