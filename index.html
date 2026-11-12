@@ -57,6 +57,9 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .card b{font-size:17px}.card small{color:var(--mu)}
 .inv.story .pg{padding-bottom:290px}.inv.story .pg.em{min-height:300px}.inv .stsc{position:absolute;left:0;bottom:0;width:100%;height:300px;pointer-events:none;z-index:0}.inv.story .pg .in{position:relative;z-index:1}.inv.story .thx{color:var(--ink);opacity:.85}
+.inv .gst{display:grid;gap:2px;justify-items:center;margin:0 auto 12px;padding:8px 18px;border:1px solid var(--ac);border-radius:16px;font-size:12px;opacity:.95}.inv .gst b{font-size:19px;color:var(--ac)}
+.gl .gadd{display:grid;gap:8px;margin:10px 0}.gl .gadd input,.gl textarea{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid var(--ln);border-radius:10px;font:inherit;background:var(--sf);color:inherit}.gl .gadd .r3{display:grid;grid-template-columns:2fr 1fr 2fr;gap:8px}
+.gl .grw{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--ln)}.gl .grw .bd{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--sf);border:1px solid var(--ln)}.gl .grw .bd.y{color:#1E7B3E}.gl .grw .bd.n{color:#B3261E}.gl .grw .bd.in{background:#1E7B3E;color:#fff;border-color:transparent}.gl .grw .ab{grid-column:1/-1;margin:0}.gl .grw small{color:var(--mu)}
 .cf{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.cf button{border:1px solid var(--ln);background:var(--sf);color:var(--tx,inherit);border-radius:999px;padding:7px 15px;font:inherit;font-size:14px;cursor:pointer}.cf button[aria-pressed=true]{background:var(--ac,#B8923A);color:#fff;border-color:transparent}
 .card[hidden]{display:none}.card>.tcode{font-size:11px;letter-spacing:1px;color:var(--mu);direction:ltr}.card .ac2{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.btn.ghost{background:none;color:inherit;border:1px solid var(--ln)}
 .pvm{position:fixed;inset:0;z-index:60;background:rgba(10,10,14,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}.pvm[hidden]{display:none}.pvm .pvs{width:360px;height:640px;position:relative;border-radius:28px;overflow:hidden;direction:ltr}.pvm .row{display:flex;gap:10px}
@@ -463,7 +466,7 @@ button.hb{cursor:pointer}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-const SCANSLUG=new URLSearchParams(location.search).get('scan'),PASSTOK=new URLSearchParams(location.search).get('pass'),PUBSLUG=new URLSearchParams(location.search).get('i')||SCANSLUG||(PASSTOK?'pass':null);let PUB=null,user=null,afterAuth=null,sb=null;
+const SCANSLUG=new URLSearchParams(location.search).get('scan'),PASSTOK=new URLSearchParams(location.search).get('pass'),PUBSLUG=new URLSearchParams(location.search).get('i')||SCANSLUG||(PASSTOK?'pass':null);let PUB=null,user=null,afterAuth=null,sb=null,GUEST=null;const GT=(new URLSearchParams(location.search).get('t')||'').toUpperCase();
 const LOCKED=true;/* true = الموقع خاص بالمالك فقط (روابط الدعوات والبطاقات والماسح تبقى مفتوحة للضيوف) */
 const isLocked=()=>LOCKED&&!PUBSLUG;
 const T=[
@@ -1221,6 +1224,9 @@ async function publish(){
 const rsvpErr=c=>/rsvp_closed/.test(c||'')?'تم إغلاق استقبال الردود لهذه الدعوة':/rate_limited/.test(c||'')?'محاولات كثيرة، حاول مرة أخرى بعد قليل':/links/.test(c||'')?'لا يمكن إضافة روابط في الاسم أو الرسالة':'تعذّر الإرسال، حاول مرة أخرى';
 async function sbRsvp(slug,name,guests,note,status){
   if(!sb)return {ok:false};
+  if(GUEST){try{const r=await sb.rpc('guest_rsvp',{p_slug:slug,p_token:GUEST.token,p_status:status,p_guests:status==='yes'?Math.max(1,+guests||1):1,p_note:note?note.slice(0,500):null});
+    if(!r.error&&status==='no'){GUEST.status='no';const mb=document.querySelector('#pubb .mypass');if(mb)mb.remove()}
+    return {ok:!r.error,token:(r.data&&r.data.token)||null,code:r.error?String(r.error.message||''):''}}catch(_){return {ok:false,code:''}}}
   try{const r=await sb.rpc('submit_rsvp',{p_slug:slug,p_name:name.slice(0,100),p_phone:null,p_status:status,p_guests:status==='yes'?Math.min(20,Math.max(1,+guests||1)):0,p_note:note?note.slice(0,500):null});return {ok:!r.error,token:r.data||null,code:r.error?String(r.error.message||''):''}}catch(_){return {ok:false,code:''}}
 }
 async function loadWall(){
@@ -1299,6 +1305,7 @@ async function bootScan(){
     if(!x){show('no','تعذّر الاتصال','تأكد من الإنترنت وحاول مرة أخرى')}
     else if(x.reason==='key')show('no','رابط الماسح غير صالح','اطلب الرابط الصحيح من صاحب الدعوة');
     else if(x.reason==='invalid')show('no','✗ رمز غير صالح','هذا الرمز ليس لهذه الدعوة');
+    else if(x.reason==='declined')show('no','✗ اعتذر عن الحضور',esc(x.name));
     else if(x.reason==='used')show('wr','⚠ تم استخدام الرمز سابقاً',esc(x.name)+' · دخل '+new Date(x.at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}));
     else show('ok','✓ مسموح بالدخول',esc(x.name)+' · عدد الحضور: '+x.guests);
     if(x){stat.textContent='دخل '+x.inside+' من '+x.total+' ضيف مؤكد';try{navigator.vibrate&&navigator.vibrate(x.ok?60:[80,60,80])}catch(_){}}
@@ -1335,12 +1342,19 @@ async function bootPublic(){
   const dd=r.data.data||{},t=dd.t==='c'?CU:(T[dd.t]||T[0]);
   PUB={slug:PUBSLUG,title:r.data.title||''};document.title=r.data.title||'دعوة';
   box.innerHTML='';mount(box,dd.d,t,false);loadWall();
-  try{const k=JSON.parse(localStorage.getItem('tk_'+PUBSLUG)||'null'),iv=box.querySelector('.inv');
+  if(/^[0-9A-F]{12}$/.test(GT)){try{const g=await sb.rpc('get_guest',{p_slug:PUBSLUG,p_token:GT});if(g.data&&g.data.token)GUEST=g.data}catch(_){}}
+  if(GUEST){const iv=box.querySelector('.inv');if(iv){
+    const fi=iv.querySelector('.pg.first .in');if(fi){const gb=document.createElement('div');gb.className='gst';gb.style.setProperty('--i','0');gb.innerHTML='<small>دعوة خاصة للضيف</small><b>'+esc(GUEST.name)+'</b>'+(GUEST.invited>1?'<small>عدد الحضور: '+GUEST.invited+'</small>':'');fi.insertBefore(gb,fi.firstChild)}
+    const rn=iv.querySelector('.rsf .rn');if(rn){rn.value=GUEST.name;rn.readOnly=true}
+    const rg=iv.querySelector('.rsf .rg');if(rg){[...rg.options].forEach(o=>{if(+o.value>GUEST.invited)o.remove()});rg.value=String(Math.min(GUEST.guests,GUEST.invited))}
+    if(GUEST.status!=='no'&&showPass(iv,GUEST.name,GUEST.guests,GUEST.token,true)){const b=document.createElement('button');b.className='mypass';b.textContent='🎫 بطاقة دخولي';b.addEventListener('click',e=>{e.stopPropagation();showPass(iv,GUEST.name,GUEST.guests,GUEST.token)});iv.appendChild(b)}
+  }}
+  else try{const k=JSON.parse(localStorage.getItem('tk_'+PUBSLUG)||'null'),iv=box.querySelector('.inv');
     if(k&&k.t&&iv&&showPass(iv,k.n,k.g,k.t,true)){const b=document.createElement('button');b.className='mypass';b.textContent='🎫 بطاقة دخولي';b.addEventListener('click',e=>{e.stopPropagation();showPass(iv,k.n,k.g,k.t)});iv.appendChild(b)}}catch(_){}
   const fit=()=>{const e=box.firstElementChild;if(e)e.style.zoom=Math.min(innerHeight/640,innerWidth/360)};fit();addEventListener('resize',fit);
 }
 /* dashboard */
-let RS={},PH={},TK={};
+let RS={},PH={},TK={},GL={};
 async function loadPhotos(card,id){
   const p=card.querySelector('.pl'),L=PH[id]||[],H='<b>صور الضيوف</b>',N=t=>`<p class="note" style="grid-column:1/-1">${t}</p>`;
   if(!L.length){p.innerHTML=H+N('لا توجد صور بعد.');return}
@@ -1349,24 +1363,39 @@ async function loadPhotos(card,id){
   if(r.error){p.innerHTML=H+N('تعذّر تحميل الصور.');return}
   const byPath={};(r.data||[]).forEach(x=>{if(x.signedUrl)byPath[x.path]=x.signedUrl});
   p.innerHTML=H+L.filter(x=>byPath[x.path]).map(x=>`<div class="pi"><a href="${esc(byPath[x.path])}" target="_blank" rel="noopener"><img src="${esc(byPath[x.path])}" alt="صورة ضيف" loading="lazy"></a><button class="dl" data-m="dph" data-id="${x.id}" data-p="${esc(x.path)}" aria-label="حذف الصورة">✕</button></div>`).join('')}
+/* guest list */
+const gUrl=(slug,tok)=>pubUrl(slug)+'&t='+tok;
+const nPhone=p=>{let d=String(p||'').replace(/[^\d]/g,'');if(d.startsWith('00'))d=d.slice(2);if(/^0\d{9}$/.test(d))d='966'+d.slice(1);return d.length>=9?d:''};
+const GMSG_DEF='حيّاك الله {الاسم} 🌹\nيسعدنا دعوتك لحضور مناسبتنا (عدد الحضور: {العدد})\nدعوتك الخاصة وبطاقة دخولك:\n{الرابط}';
+const gMsg=()=>{try{return localStorage.getItem('gmsg')||GMSG_DEF}catch(_){return GMSG_DEF}};
+const gText=(slug,g)=>gMsg().replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token));
+function glHtml(i){const L=GL[i.id]||[],inv=L.reduce((s,g)=>s+(g.invited||g.guests),0),yes=L.filter(g=>g.status==='yes'),no=L.filter(g=>g.status==='no'),ins=L.filter(g=>g.checked_at),op=L.filter(g=>g.opened_at);
+  const bd=g=>g.checked_at?'<span class="bd in">دخل ✓</span>':g.status==='yes'?`<span class="bd y">أكّد (${g.guests})</span>`:g.status==='no'?'<span class="bd n">اعتذر</span>':g.opened_at?'<span class="bd">فتح الدعوة</span>':'<span class="bd">لم يفتح</span>';
+  return `<b>قائمة المدعوين</b><p class="note">أضف الأسماء، ولكل ضيف رابط خاص باسمه وباركود وعدد أشخاصه. أرسل له رابطه من هنا بالواتساب.${i.qe==='true'?'':'<br><b style="color:#B3261E">فعّل «بطاقة الدخول QR» في الاستوديو ثم «تحديث الدعوة المنشورة» حتى تظهر بطاقة الباركود للضيف.</b>'}</p>
+<div class="st"><span><b>${L.length}</b> مدعو (${inv} شخص)</span><span><b>${yes.length}</b> أكّدوا</span><span><b>${no.length}</b> اعتذروا</span><span><b>${op.length}</b> فتحوا الدعوة</span><span><b>${ins.length}</b> دخلوا</span></div>
+<div class="gadd"><div class="r3"><input class="gn" placeholder="اسم الضيف" maxlength="100" aria-label="اسم الضيف"><input class="gc" type="number" min="1" max="50" value="1" aria-label="عدد الأشخاص"><input class="gp" dir="ltr" placeholder="الجوال (اختياري)" aria-label="الجوال"></div><div class="ab"><button class="nx" data-m="gadd">إضافة ضيف</button></div>
+<textarea class="gb" rows="3" placeholder="إضافة جماعية: اسم في كل سطر، ويمكنك لصقها من إكسل.&#10;مثال:&#10;أحمد العتيبي، 3، 0501234567&#10;سارة الحربي، 1" aria-label="إضافة جماعية"></textarea><div class="ab"><button class="nx" data-m="gbulk">إضافة القائمة</button></div>
+<small class="note">نص رسالة الواتساب (يمكنك تعديله): استخدم {الاسم} و{العدد} و{الرابط}</small><textarea class="gm2" rows="4" aria-label="نص الرسالة">${esc(gMsg())}</textarea></div>
+${L.length?`<div class="ab" style="margin:6px 0"><button class="nx" data-m="gall">نسخ كل الروابط</button><button class="nx" data-m="gcsv">تحميل الملف (CSV)</button></div>`:''}
+${L.map(g=>`<div class="grw" data-g="${g.id}"><div><b>${esc(g.name)}</b> <small>· ${g.invited||g.guests} ${(g.invited||g.guests)>1?'أشخاص':'شخص'}${g.phone?' · '+esc(g.phone):''}</small></div>${bd(g)}<div class="ab"><button class="nx" data-m="gwa" data-id="${g.id}">واتساب</button><button class="nx" data-m="gcp" data-id="${g.id}">نسخ الرابط</button><button class="nx" data-m="ged" data-id="${g.id}">تعديل</button><button class="nx" data-m="gdl" data-id="${g.id}">حذف</button></div></div>`).join('')}`}
 async function renderMy(){
   const el=$('#myl');$('#mye').textContent=user?user.email:'';
-  const was={};document.querySelectorAll('#myl .ic2').forEach(c=>{const g=q=>{const e=c.querySelector(q);return !!e&&!e.hidden};was[c.dataset.id]=[g('.rl'),g('.pl'),g('.sp')]});
+  const was={};document.querySelectorAll('#myl .ic2').forEach(c=>{const g=q=>{const e=c.querySelector(q);return !!e&&!e.hidden};was[c.dataset.id]=[g('.rl'),g('.pl'),g('.sp'),g('.gl')]});
   el.innerHTML='<p class="note">جارٍ التحميل…</p>';
-  let a,b,ph,tk;try{[a,b,ph,tk]=await Promise.all([sb.from('invitations').select('id,slug,title,status,created_at,scan_key,rsvp_open,qe:data->d->>qe').order('created_at',{ascending:false}),sb.from('rsvps').select('id,invitation_id,name,status,guests,note,created_at').order('created_at',{ascending:false}),sb.from('photos').select('id,invitation_id,path,created_at').order('created_at',{ascending:false}),sb.from('tickets').select('invitation_id,guests,checked_at')])}catch(_){a={error:1}}
+  let a,b,ph,tk;try{[a,b,ph,tk]=await Promise.all([sb.from('invitations').select('id,slug,title,status,created_at,scan_key,rsvp_open,qe:data->d->>qe').order('created_at',{ascending:false}),sb.from('rsvps').select('id,invitation_id,name,status,guests,note,created_at').order('created_at',{ascending:false}),sb.from('photos').select('id,invitation_id,path,created_at').order('created_at',{ascending:false}),sb.from('tickets').select('id,invitation_id,name,guests,invited,phone,source,status,checked_at,opened_at,token,created_at').order('created_at',{ascending:true})])}catch(_){a={error:1}}
   if(a.error){el.innerHTML='<p class="note">تعذّر تحميل الدعوات.</p>';return}
   RS={};(b.data||[]).forEach(r=>(RS[r.invitation_id]=RS[r.invitation_id]||[]).push(r));
-  TK={};((tk&&tk.data)||[]).forEach(r=>{const o=TK[r.invitation_id]=TK[r.invitation_id]||{t:0,i:0};o.t+=r.guests;if(r.checked_at)o.i+=r.guests});
+  TK={};GL={};((tk&&tk.data)||[]).forEach(r=>{if(r.source==='list')(GL[r.invitation_id]=GL[r.invitation_id]||[]).push(r);if(r.status==='no')return;const o=TK[r.invitation_id]=TK[r.invitation_id]||{t:0,i:0};o.t+=r.guests;if(r.checked_at)o.i+=r.guests});
   PH={};((ph&&ph.data)||[]).forEach(r=>(PH[r.invitation_id]=PH[r.invitation_id]||[]).push(r));
   if(!a.data.length){el.innerHTML='<div class="emp">لا توجد دعوات منشورة بعد.<br>أنشئ دعوتك من الاستوديو واضغط «نشر الدعوة».</div>';return}
   const fmt=t=>new Date(t).toLocaleString('ar-SA',{dateStyle:'medium',timeStyle:'short'});
   el.innerHTML=a.data.map(i=>{const rs=RS[i.id]||[],y=rs.filter(r=>r.status==='yes'),n=rs.filter(r=>r.status==='no'),g=y.reduce((s,r)=>s+r.guests,0),l=pubUrl(i.slug);
-    return `<article class="ic2" data-id="${i.id}" data-open="${i.rsvp_open===false?0:1}"><div><h3>${esc(i.title)}<span class="tg">${i.status==='published'?'منشورة':'مسودة'}</span>${i.rsvp_open===false?'<span class="tg" style="color:#B3261E">الردود مغلقة</span>':''}</h3><small class="note">${fmt(i.created_at)}</small></div>
+    return `<article class="ic2" data-slug="${esc(i.slug)}" data-id="${i.id}" data-open="${i.rsvp_open===false?0:1}"><div><h3>${esc(i.title)}<span class="tg">${i.status==='published'?'منشورة':'مسودة'}</span>${i.rsvp_open===false?'<span class="tg" style="color:#B3261E">الردود مغلقة</span>':''}</h3><small class="note">${fmt(i.created_at)}</small></div>
 <div class="st"><span><b>${y.length}</b> سيحضرون (${g} شخص)</span><span><b>${n.length}</b> معتذرون</span>${i.qe==='true'?`<span><b>${(TK[i.id]||{i:0}).i}</b> دخلوا من ${(TK[i.id]||{t:0}).t}</span>`:''}</div>
 <div class="lkb"><input readonly dir="ltr" value="${esc(l)}" aria-label="رابط الدعوة" onfocus="this.select()"></div>
-<div class="ab"><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح</a><button class="nx" data-m="cp" data-l="${esc(l)}">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(l)}">إرسال الرابط بالواتساب</a><button class="nx" data-m="rs" aria-pressed="false">ردود الضيوف (${rs.length})</button>${i.qe==='true'?`<button class="nx" data-m="sc" aria-pressed="false">ماسح الدخول</button>`:''}<button class="nx" data-m="ph" aria-pressed="false">صور الضيوف (${(PH[i.id]||[]).length})</button><button class="nx" data-m="rop">${i.rsvp_open===false?'فتح استقبال الردود':'إيقاف استقبال الردود'}</button><button class="nx" data-m="ed">تعديل</button><button class="nx" data-m="rm">حذف</button></div>
-<div class="rl" hidden><b>ردود الضيوف</b>${rs.length?rs.map(r=>`<div class="rr"><b>${esc(r.name)}</b><span class="${r.status==='yes'?'y':'n'}">${r.status==='yes'?'سيحضر ('+r.guests+')':'معتذر'}</span><button class="dl" data-m="drs" data-id="${r.id}" aria-label="حذف الرد">✕</button>${r.note?`<small>${esc(r.note)}</small>`:''}<small>${fmt(r.created_at)}</small></div>`).join(''):'<p class="note">لا توجد ردود بعد.</p>'}</div><div class="pl" hidden></div>${i.qe==='true'?`<div class="sp" hidden><b>رابط الماسح</b><p class="note">أرسله لموظفي الاستقبال، يفتح الكاميرا ويتحقق من رمز كل ضيف بدون حساب. لا تشاركه مع الضيوف.</p><input readonly dir="ltr" value="${esc(scanUrl(i))}" aria-label="رابط الماسح" onfocus="this.select()"><div class="ab"><button class="nx" data-m="cp" data-l="${esc(scanUrl(i))}">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="${esc(scanUrl(i))}">فتح الماسح</a><a class="nx" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('رابط ماسح الدخول: '+scanUrl(i))}">إرسال بالواتساب</a></div></div>`:''}</article>`}).join('');
-  el.querySelectorAll('.ic2').forEach(c=>{const w=was[c.dataset.id];if(!w)return;[['.rl','rs'],['.pl','ph'],['.sp','sc']].forEach(([q,m],k)=>{if(!w[k])return;const e=c.querySelector(q);if(!e)return;e.hidden=false;const bt=c.querySelector('[data-m="'+m+'"]');if(bt)bt.setAttribute('aria-pressed','true');if(m==='ph')loadPhotos(c,c.dataset.id)})});
+<div class="ab"><a class="nx" target="_blank" rel="noopener" href="${esc(l)}">فتح</a><button class="nx" data-m="cp" data-l="${esc(l)}">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(l)}">إرسال الرابط بالواتساب</a><button class="nx" data-m="rs" aria-pressed="false">ردود الضيوف (${rs.length})</button>${i.qe==='true'?`<button class="nx" data-m="sc" aria-pressed="false">ماسح الدخول</button>`:''}<button class="nx" data-m="gl" aria-pressed="false">قائمة المدعوين (${(GL[i.id]||[]).length})</button><button class="nx" data-m="ph" aria-pressed="false">صور الضيوف (${(PH[i.id]||[]).length})</button><button class="nx" data-m="rop">${i.rsvp_open===false?'فتح استقبال الردود':'إيقاف استقبال الردود'}</button><button class="nx" data-m="ed">تعديل</button><button class="nx" data-m="rm">حذف</button></div>
+<div class="rl" hidden><b>ردود الضيوف</b>${rs.length?rs.map(r=>`<div class="rr"><b>${esc(r.name)}</b><span class="${r.status==='yes'?'y':'n'}">${r.status==='yes'?'سيحضر ('+r.guests+')':'معتذر'}</span><button class="dl" data-m="drs" data-id="${r.id}" aria-label="حذف الرد">✕</button>${r.note?`<small>${esc(r.note)}</small>`:''}<small>${fmt(r.created_at)}</small></div>`).join(''):'<p class="note">لا توجد ردود بعد.</p>'}</div><div class="pl" hidden></div><div class="gl" hidden>${glHtml(i)}</div>${i.qe==='true'?`<div class="sp" hidden><b>رابط الماسح</b><p class="note">أرسله لموظفي الاستقبال، يفتح الكاميرا ويتحقق من رمز كل ضيف بدون حساب. لا تشاركه مع الضيوف.</p><input readonly dir="ltr" value="${esc(scanUrl(i))}" aria-label="رابط الماسح" onfocus="this.select()"><div class="ab"><button class="nx" data-m="cp" data-l="${esc(scanUrl(i))}">نسخ الرابط</button><a class="nx" target="_blank" rel="noopener" href="${esc(scanUrl(i))}">فتح الماسح</a><a class="nx" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('رابط ماسح الدخول: '+scanUrl(i))}">إرسال بالواتساب</a></div></div>`:''}</article>`}).join('');
+  el.querySelectorAll('.ic2').forEach(c=>{const w=was[c.dataset.id];if(!w)return;[['.rl','rs'],['.pl','ph'],['.sp','sc'],['.gl','gl']].forEach(([q,m],k)=>{if(!w[k])return;const e=c.querySelector(q);if(!e)return;e.hidden=false;const bt=c.querySelector('[data-m="'+m+'"]');if(bt)bt.setAttribute('aria-pressed','true');if(m==='ph')loadPhotos(c,c.dataset.id)})});
 }
 $('#my').addEventListener('click',async e=>{
   const b=e.target.closest('[data-m],[data-a]');if(!b)return;
@@ -1377,6 +1406,25 @@ $('#my').addEventListener('click',async e=>{
   else if(m==='rs'){const r=card.querySelector('.rl');r.hidden=!r.hidden;b.setAttribute('aria-pressed',String(!r.hidden))}
   else if(m==='sc'){const p=card.querySelector('.sp');p.hidden=!p.hidden;b.setAttribute('aria-pressed',String(!p.hidden))}
   else if(m==='ph'){const p=card.querySelector('.pl');p.hidden=!p.hidden;b.setAttribute('aria-pressed',String(!p.hidden));if(!p.hidden)loadPhotos(card,id)}
+  else if(m==='gl'){const p=card.querySelector('.gl');p.hidden=!p.hidden;b.setAttribute('aria-pressed',String(!p.hidden))}
+  else if(m==='gadd'||m==='gbulk'){
+    const slug=card.dataset.slug,rows=[];
+    if(m==='gadd'){const n=card.querySelector('.gn').value.trim(),c=Math.min(50,Math.max(1,+card.querySelector('.gc').value||1)),p=card.querySelector('.gp').value.trim();if(!n){alert('اكتب اسم الضيف.');return}rows.push({invitation_id:id,name:n.slice(0,100),invited:c,phone:p.slice(0,30)||null,source:'list'})}
+    else{String(card.querySelector('.gb').value||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).split(/\r?\n/).forEach(ln=>{const parts=ln.split(/[\t,،;؛]+/).map(x=>x.trim()).filter(Boolean);if(!parts.length)return;let n='',c=1,p='';parts.forEach(x=>{const d=x.replace(/[\s+\-()]/g,'');if(/^\d+$/.test(d)){if(d.length<=3)c=Math.min(50,Math.max(1,+d));else p=x}else if(!n)n=x});if(n)rows.push({invitation_id:id,name:n.slice(0,100),invited:c,phone:p.slice(0,30)||null,source:'list'})});
+      if(!rows.length){alert('اكتب اسماً واحداً على الأقل.');return}}
+    b.disabled=true;const r=await sb.from('tickets').insert(rows);b.disabled=false;
+    if(r.error){alert(/list_full/.test(r.error.message||'')?'وصلت للحد الأقصى (1000 ضيف) لهذه الدعوة.':'تعذّرت الإضافة.');return}renderMy()}
+  else if(m==='gwa'||m==='gcp'||m==='ged'||m==='gdl'){
+    const g=(GL[id]||[]).find(x=>x.id===b.dataset.id);if(!g)return;const slug=card.dataset.slug;
+    if(m==='gwa'){const ta=card.querySelector('.gm2');try{if(ta)localStorage.setItem('gmsg',ta.value)}catch(_){}const txt=(ta&&ta.value?ta.value:gMsg()).replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token)),ph=nPhone(g.phone);window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(txt),'_blank','noopener')}
+    else if(m==='gcp'){try{await navigator.clipboard.writeText(gUrl(slug,g.token));b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
+    else if(m==='ged'){const n=prompt('اسم الضيف',g.name);if(n===null||!n.trim())return;const c=prompt('عدد الأشخاص',String(g.invited||g.guests));if(c===null)return;const r=await sb.from('tickets').update({name:n.trim().slice(0,100),invited:Math.min(50,Math.max(1,+c||1))}).eq('id',g.id);if(r.error)alert('تعذّر التعديل.');else renderMy()}
+    else{if(!confirm('حذف «'+g.name+'» من القائمة؟ سيتوقف رابطه وباركوده.'))return;const r=await sb.from('tickets').delete().eq('id',g.id);if(r.error)alert('تعذّر الحذف.');else renderMy()}}
+  else if(m==='gall'||m==='gcsv'){
+    const slug=card.dataset.slug,L=GL[id]||[];
+    if(m==='gall'){try{await navigator.clipboard.writeText(L.map(g=>g.name+'\t'+gUrl(slug,g.token)).join('\n'));b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
+    else{const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',rows=[['الاسم','العدد','الجوال','الرابط','الحالة','دخل']].concat(L.map(g=>[g.name,g.invited||g.guests,g.phone||'',gUrl(slug,g.token),g.status==='yes'?'أكد':g.status==='no'?'اعتذر':'',g.checked_at?'نعم':'']));
+      const bl=new Blob(['\ufeff'+rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='guests.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}}
   else if(m==='drs'){if(!confirm('حذف هذا الرد نهائياً؟'))return;const r=await sb.from('rsvps').delete().eq('id',b.dataset.id);if(r.error)alert('تعذّر الحذف.');else renderMy()}
   else if(m==='dph'){if(!confirm('حذف هذه الصورة نهائياً؟'))return;try{await sb.storage.from('guest-photos').remove([b.dataset.p])}catch(_){}const r=await sb.from('photos').delete().eq('id',b.dataset.id);if(r.error)alert('تعذّر الحذف.');else renderMy()}
   else if(m==='rop'){const on=card.dataset.open==='1';b.disabled=true;const r=await sb.from('invitations').update({rsvp_open:!on}).eq('id',id);b.disabled=false;if(r.error)alert('تعذّر التعديل.');else renderMy()}
