@@ -1377,7 +1377,8 @@ async function loadPhotos(card,id){
 const gUrl=(slug,tok)=>pubUrl(slug)+'&t='+tok;
 const nPhone=p=>{let d=String(p||'').replace(/[^\d]/g,'');if(d.startsWith('00'))d=d.slice(2);if(/^0\d{9}$/.test(d))d='966'+d.slice(1);return d.length>=9?d:''};
 const GMSG_DEF='حيّاك الله {الاسم}\nيسعدنا دعوتك لحضور مناسبتنا (عدد الحضور: {العدد})\nدعوتك الخاصة وبطاقة دخولك:\n{الرابط}';
-const gMsg=()=>{try{return localStorage.getItem('gmsg')||GMSG_DEF}catch(_){return GMSG_DEF}};
+const gClean=t=>String(t||'').replace(/[\u{10000}-\u{10FFFF}\u2600-\u27BF\uFE0F\u200D\uFFFD]/gu,'');
+const gMsg=()=>{try{return gClean(localStorage.getItem('gmsg2'))||GMSG_DEF}catch(_){return GMSG_DEF}};
 const gText=(slug,g)=>gMsg().replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token));
 function glHtml(i){const L=GL[i.id]||[],inv=L.reduce((s,g)=>s+(g.invited||g.guests),0),yes=L.filter(g=>g.status==='yes'),no=L.filter(g=>g.status==='no'),ins=L.filter(g=>g.checked_at),op=L.filter(g=>g.opened_at);
   const bd=g=>g.checked_at?'<span class="bd in">دخل ✓</span>':g.status==='yes'?`<span class="bd y">أكّد (${g.guests})</span>`:g.status==='no'?'<span class="bd n">اعتذر</span>':g.opened_at?'<span class="bd">فتح الدعوة</span>':'<span class="bd">لم يفتح</span>';
@@ -1426,7 +1427,7 @@ $('#my').addEventListener('click',async e=>{
     if(r.error){alert(/list_full/.test(r.error.message||'')?'وصلت للحد الأقصى (1000 ضيف) لهذه الدعوة.':'تعذّرت الإضافة.');return}renderMy()}
   else if(m==='gwa'||m==='gcp'||m==='ged'||m==='gdl'){
     const g=(GL[id]||[]).find(x=>x.id===b.dataset.id);if(!g)return;const slug=card.dataset.slug;
-    if(m==='gwa'){const ta=card.querySelector('.gm2');try{if(ta)localStorage.setItem('gmsg',ta.value)}catch(_){}const txt=(ta&&ta.value?ta.value:gMsg()).replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token)).replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F\u200D]/gu,''),ph=nPhone(g.phone);window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(txt),'_blank','noopener')}
+    if(m==='gwa'){const ta=card.querySelector('.gm2');try{if(ta)localStorage.setItem('gmsg2',gClean(ta.value))}catch(_){}const txt=(ta&&ta.value?ta.value:gMsg()).replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token)).replace(/[\u{10000}-\u{10FFFF}\u2600-\u27BF\uFE0F\u200D\uFFFD]/gu,''),ph=nPhone(g.phone);window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(txt),'_blank','noopener')}
     else if(m==='gcp'){try{await navigator.clipboard.writeText(gUrl(slug,g.token));b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
     else if(m==='ged'){const n=prompt('اسم الضيف',g.name);if(n===null||!n.trim())return;const c=prompt('عدد الأشخاص',String(g.invited||g.guests));if(c===null)return;const r=await sb.from('tickets').update({name:n.trim().slice(0,100),invited:Math.min(50,Math.max(1,+c||1))}).eq('id',g.id);if(r.error)alert('تعذّر التعديل.');else renderMy()}
     else{if(!confirm('حذف «'+g.name+'» من القائمة؟ سيتوقف رابطه وباركوده.'))return;const r=await sb.from('tickets').delete().eq('id',g.id);if(r.error)alert('تعذّر الحذف.');else renderMy()}}
