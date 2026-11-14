@@ -69,6 +69,7 @@ h2.t{font:700 30px Amiri,serif;margin:0 0 6px;color:var(--pr)}
 .inv.story .pg{padding-bottom:290px}.inv.story .pg.em{min-height:300px}.inv .stsc{position:absolute;left:0;bottom:0;width:100%;height:300px;pointer-events:none;z-index:0}.inv.story .pg .in{position:relative;z-index:1}.inv.story .thx{color:var(--ink);opacity:.85}
 .inv .gst{display:grid;gap:2px;justify-items:center;margin:0 auto 12px;padding:8px 18px;border:1px solid var(--ac);border-radius:16px;font-size:12px;opacity:.95}.inv .gst b{font-size:19px;color:var(--ac)}
 .gl .gadd{display:grid;gap:8px;margin:10px 0}.gl .gadd input,.gl textarea{width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid var(--ln);border-radius:10px;font:inherit;background:var(--sf);color:inherit}.gl .gadd .r3{display:grid;grid-template-columns:2fr 1fr 2fr;gap:8px}
+.gl .gnx{display:grid;gap:8px;margin:10px 0;padding:12px;border:1px dashed var(--ln);border-radius:14px;justify-items:start}.gl .gnx .gnb{background:var(--pr);color:var(--on);border-color:transparent;font-weight:700}
 .gl .grw{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--ln)}.gl .grw .bd{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--sf);border:1px solid var(--ln)}.gl .grw .bd.y{color:#1E7B3E}.gl .grw .bd.n{color:#B3261E}.gl .grw .bd.in{background:#1E7B3E;color:#fff;border-color:transparent}.gl .grw .ab{grid-column:1/-1;margin:0}.gl .grw small{color:var(--mu)}
 .cf{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.cf button{border:1px solid var(--ln);background:var(--sf);color:var(--tx,inherit);border-radius:999px;padding:7px 15px;font:inherit;font-size:14px;cursor:pointer}.cf button[aria-pressed=true]{background:var(--ac,#B8923A);color:#fff;border-color:transparent}
 .card[hidden]{display:none}.card>.tcode{font-size:11px;letter-spacing:1px;color:var(--mu);direction:ltr}.card .ac2{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.btn.ghost{background:none;color:inherit;border:1px solid var(--ln)}
@@ -1364,7 +1365,7 @@ async function bootPublic(){
   const fit=()=>{const e=box.firstElementChild;if(e)e.style.zoom=Math.min(innerHeight/640,innerWidth/360)};fit();addEventListener('resize',fit);
 }
 /* dashboard */
-let RS={},PH={},TK={},GL={};
+let RS={},PH={},TK={},GL={},INV={};
 async function loadPhotos(card,id){
   const p=card.querySelector('.pl'),L=PH[id]||[],H='<b>صور الضيوف</b>',N=t=>`<p class="note" style="grid-column:1/-1">${t}</p>`;
   if(!L.length){p.innerHTML=H+N('لا توجد صور بعد.');return}
@@ -1380,24 +1381,32 @@ const GMSG_DEF='حيّاك الله {الاسم}\nيسعدنا دعوتك لحض
 const gClean=t=>String(t||'').replace(/[\u{10000}-\u{10FFFF}\u2600-\u27BF\uFE0F\u200D\uFFFD]/gu,'');
 const gMsg=()=>{try{return gClean(localStorage.getItem('gmsg2'))||GMSG_DEF}catch(_){return GMSG_DEF}};
 const gText=(slug,g)=>gMsg().replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token));
+const gSend=(card,slug,g)=>{const ta=card.querySelector('.gm2');try{if(ta)localStorage.setItem('gmsg2',gClean(ta.value))}catch(_){}
+  const txt=gClean((ta&&ta.value?ta.value:gMsg()).replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token)));
+  window.open('https://wa.me/'+nPhone(g.phone)+'?text='+encodeURIComponent(txt),'_blank','noopener')};
+async function gMark(card,id,g,on){g.sent_at=on?new Date().toISOString():null;const r=await sb.from('tickets').update({sent_at:g.sent_at}).eq('id',g.id);if(r.error){g.sent_at=on?null:g.sent_at;return false}const p=card.querySelector('.gl');if(p)p.innerHTML=glHtml(INV[id]);return true}
 function glHtml(i){const L=GL[i.id]||[],inv=L.reduce((s,g)=>s+(g.invited||g.guests),0),yes=L.filter(g=>g.status==='yes'),no=L.filter(g=>g.status==='no'),ins=L.filter(g=>g.checked_at),op=L.filter(g=>g.opened_at);
+  const todo=L.filter(g=>!g.sent_at&&g.status!=='no'&&!g.checked_at),nxt=todo[0],sent=L.filter(g=>g.sent_at).length;
   const bd=g=>g.checked_at?'<span class="bd in">دخل ✓</span>':g.status==='yes'?`<span class="bd y">أكّد (${g.guests})</span>`:g.status==='no'?'<span class="bd n">اعتذر</span>':g.opened_at?'<span class="bd">فتح الدعوة</span>':'<span class="bd">لم يفتح</span>';
+  const sd=g=>g.sent_at?'<span class="bd y">أُرسل ✓</span> ':'';
   return `<b>قائمة المدعوين</b><p class="note">أضف الأسماء، ولكل ضيف رابط خاص باسمه وباركود وعدد أشخاصه. أرسل له رابطه من هنا بالواتساب.${i.qe==='true'?'':'<br><b style="color:#B3261E">فعّل «بطاقة الدخول QR» في الاستوديو ثم «تحديث الدعوة المنشورة» حتى تظهر بطاقة الباركود للضيف.</b>'}</p>
-<div class="st"><span><b>${L.length}</b> مدعو (${inv} شخص)</span><span><b>${yes.length}</b> أكّدوا</span><span><b>${no.length}</b> اعتذروا</span><span><b>${op.length}</b> فتحوا الدعوة</span><span><b>${ins.length}</b> دخلوا</span></div>
+<div class="st"><span><b>${L.length}</b> مدعو (${inv} شخص)</span><span><b>${yes.length}</b> أكّدوا</span><span><b>${no.length}</b> اعتذروا</span><span><b>${op.length}</b> فتحوا الدعوة</span><span><b>${ins.length}</b> دخلوا</span><span><b>${sent}</b> أُرسل لهم</span></div>
+${L.length?`<div class="gnx">${nxt?`<small>التالي: <b>${esc(nxt.name)}</b>${nxt.phone?'':' (بدون رقم، ستختار جهة الاتصال بنفسك)'} · المتبقي ${todo.length}</small><button class="nx gnb" data-m="gnext">أرسل للتالي ←</button>`:`<small>${sent?'تم الإرسال لكل المدعوين ✓':'لا يوجد ضيوف بانتظار الإرسال.'}</small>`}${sent?'<button class="nx" data-m="grst">إعادة ضبط علامات الإرسال</button>':''}</div>`:''}
 <div class="gadd"><div class="r3"><input class="gn" placeholder="اسم الضيف" maxlength="100" aria-label="اسم الضيف"><input class="gc" type="number" min="1" max="50" value="1" aria-label="عدد الأشخاص"><input class="gp" dir="ltr" placeholder="الجوال (اختياري)" aria-label="الجوال"></div><div class="ab"><button class="nx" data-m="gadd">إضافة ضيف</button></div>
 <textarea class="gb" rows="3" placeholder="إضافة جماعية: اسم في كل سطر، ويمكنك لصقها من إكسل.&#10;مثال:&#10;أحمد العتيبي، 3، 0501234567&#10;سارة الحربي، 1" aria-label="إضافة جماعية"></textarea><div class="ab"><button class="nx" data-m="gbulk">إضافة القائمة</button></div>
 <small class="note">نص رسالة الواتساب (يمكنك تعديله): استخدم {الاسم} و{العدد} و{الرابط}</small><textarea class="gm2" rows="4" aria-label="نص الرسالة">${esc(gMsg())}</textarea></div>
 ${L.length?`<div class="ab" style="margin:6px 0"><button class="nx" data-m="gall">نسخ كل الروابط</button><button class="nx" data-m="gcsv">تحميل الملف (CSV)</button></div>`:''}
-${L.map(g=>`<div class="grw" data-g="${g.id}"><div><b>${esc(g.name)}</b> <small>· ${g.invited||g.guests} ${(g.invited||g.guests)>1?'أشخاص':'شخص'}${g.phone?' · '+esc(g.phone):''}</small></div>${bd(g)}<div class="ab"><button class="nx" data-m="gwa" data-id="${g.id}">واتساب</button><button class="nx" data-m="gcp" data-id="${g.id}">نسخ الرابط</button><button class="nx" data-m="ged" data-id="${g.id}">تعديل</button><button class="nx" data-m="gdl" data-id="${g.id}">حذف</button></div></div>`).join('')}`}
+${L.map(g=>`<div class="grw" data-g="${g.id}"><div><b>${esc(g.name)}</b> <small>· ${g.invited||g.guests} ${(g.invited||g.guests)>1?'أشخاص':'شخص'}${g.phone?' · '+esc(g.phone):''}</small></div><span>${sd(g)}${bd(g)}</span><div class="ab"><button class="nx" data-m="gwa" data-id="${g.id}">واتساب</button><button class="nx" data-m="gsent" data-id="${g.id}">${g.sent_at?'إلغاء علامة الإرسال':'علّم كمُرسل'}</button><button class="nx" data-m="gcp" data-id="${g.id}">نسخ الرابط</button><button class="nx" data-m="ged" data-id="${g.id}">تعديل</button><button class="nx" data-m="gdl" data-id="${g.id}">حذف</button></div></div>`).join('')}`}
 async function renderMy(){
   const el=$('#myl');$('#mye').textContent=user?user.email:'';
   const was={};document.querySelectorAll('#myl .ic2').forEach(c=>{const g=q=>{const e=c.querySelector(q);return !!e&&!e.hidden};was[c.dataset.id]=[g('.rl'),g('.pl'),g('.sp'),g('.gl')]});
   el.innerHTML='<p class="note">جارٍ التحميل…</p>';
-  let a,b,ph,tk;try{[a,b,ph,tk]=await Promise.all([sb.from('invitations').select('id,slug,title,status,created_at,scan_key,rsvp_open,qe:data->d->>qe').order('created_at',{ascending:false}),sb.from('rsvps').select('id,invitation_id,name,status,guests,note,created_at').order('created_at',{ascending:false}),sb.from('photos').select('id,invitation_id,path,created_at').order('created_at',{ascending:false}),sb.from('tickets').select('id,invitation_id,name,guests,invited,phone,source,status,checked_at,opened_at,token,created_at').order('created_at',{ascending:true})])}catch(_){a={error:1}}
+  let a,b,ph,tk;try{[a,b,ph,tk]=await Promise.all([sb.from('invitations').select('id,slug,title,status,created_at,scan_key,rsvp_open,qe:data->d->>qe').order('created_at',{ascending:false}),sb.from('rsvps').select('id,invitation_id,name,status,guests,note,created_at').order('created_at',{ascending:false}),sb.from('photos').select('id,invitation_id,path,created_at').order('created_at',{ascending:false}),sb.from('tickets').select('id,invitation_id,name,guests,invited,phone,source,status,checked_at,opened_at,sent_at,token,created_at').order('created_at',{ascending:true})])}catch(_){a={error:1}}
   if(a.error){el.innerHTML='<p class="note">تعذّر تحميل الدعوات.</p>';return}
   RS={};(b.data||[]).forEach(r=>(RS[r.invitation_id]=RS[r.invitation_id]||[]).push(r));
   TK={};GL={};((tk&&tk.data)||[]).forEach(r=>{if(r.source==='list')(GL[r.invitation_id]=GL[r.invitation_id]||[]).push(r);if(r.status==='no')return;const o=TK[r.invitation_id]=TK[r.invitation_id]||{t:0,i:0};o.t+=r.guests;if(r.checked_at)o.i+=r.guests});
   PH={};((ph&&ph.data)||[]).forEach(r=>(PH[r.invitation_id]=PH[r.invitation_id]||[]).push(r));
+  INV={};a.data.forEach(i=>INV[i.id]=i);
   if(!a.data.length){el.innerHTML='<div class="emp">لا توجد دعوات منشورة بعد.<br>أنشئ دعوتك من الاستوديو واضغط «نشر الدعوة».</div>';return}
   const fmt=t=>new Date(t).toLocaleString('ar-SA',{dateStyle:'medium',timeStyle:'short'});
   el.innerHTML=a.data.map(i=>{const rs=RS[i.id]||[],y=rs.filter(r=>r.status==='yes'),n=rs.filter(r=>r.status==='no'),g=y.reduce((s,r)=>s+r.guests,0),l=pubUrl(i.slug);
@@ -1425,12 +1434,15 @@ $('#my').addEventListener('click',async e=>{
       if(!rows.length){alert('اكتب اسماً واحداً على الأقل.');return}}
     b.disabled=true;const r=await sb.from('tickets').insert(rows);b.disabled=false;
     if(r.error){alert(/list_full/.test(r.error.message||'')?'وصلت للحد الأقصى (1000 ضيف) لهذه الدعوة.':'تعذّرت الإضافة.');return}renderMy()}
-  else if(m==='gwa'||m==='gcp'||m==='ged'||m==='gdl'){
+  else if(m==='gwa'||m==='gcp'||m==='ged'||m==='gdl'||m==='gsent'){
     const g=(GL[id]||[]).find(x=>x.id===b.dataset.id);if(!g)return;const slug=card.dataset.slug;
-    if(m==='gwa'){const ta=card.querySelector('.gm2');try{if(ta)localStorage.setItem('gmsg2',gClean(ta.value))}catch(_){}const txt=(ta&&ta.value?ta.value:gMsg()).replace(/\{الاسم\}/g,g.name).replace(/\{العدد\}/g,g.invited||g.guests).replace(/\{الرابط\}/g,gUrl(slug,g.token)).replace(/[\u{10000}-\u{10FFFF}\u2600-\u27BF\uFE0F\u200D\uFFFD]/gu,''),ph=nPhone(g.phone);window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(txt),'_blank','noopener')}
+    if(m==='gsent'){await gMark(card,id,g,!g.sent_at);return}
+    if(m==='gwa'){gSend(card,slug,g);gMark(card,id,g,true);return}
     else if(m==='gcp'){try{await navigator.clipboard.writeText(gUrl(slug,g.token));b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
     else if(m==='ged'){const n=prompt('اسم الضيف',g.name);if(n===null||!n.trim())return;const c=prompt('عدد الأشخاص',String(g.invited||g.guests));if(c===null)return;const r=await sb.from('tickets').update({name:n.trim().slice(0,100),invited:Math.min(50,Math.max(1,+c||1))}).eq('id',g.id);if(r.error)alert('تعذّر التعديل.');else renderMy()}
     else{if(!confirm('حذف «'+g.name+'» من القائمة؟ سيتوقف رابطه وباركوده.'))return;const r=await sb.from('tickets').delete().eq('id',g.id);if(r.error)alert('تعذّر الحذف.');else renderMy()}}
+  else if(m==='gnext'){const L=GL[id]||[],g=L.find(x=>!x.sent_at&&x.status!=='no'&&!x.checked_at);if(!g)return;gSend(card,card.dataset.slug,g);gMark(card,id,g,true)}
+  else if(m==='grst'){if(!confirm('مسح علامة «تم الإرسال» عن كل الضيوف؟'))return;const r=await sb.from('tickets').update({sent_at:null}).eq('invitation_id',id).eq('source','list');if(r.error)alert('تعذّر التعديل.');else renderMy()}
   else if(m==='gall'||m==='gcsv'){
     const slug=card.dataset.slug,L=GL[id]||[];
     if(m==='gall'){try{await navigator.clipboard.writeText(L.map(g=>g.name+'\t'+gUrl(slug,g.token)).join('\n'));b.textContent='تم النسخ ✓'}catch(_){b.textContent='انسخ يدوياً'}}
