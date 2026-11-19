@@ -756,7 +756,7 @@ function inv(d,t){
   const vs=(d.vs&&d.vs.length?d.vs:[{n:d.venue,a:'',m:d.map}]).filter(v=>v.n||v.a),ok2=u=>/^https?:\/\//i.test(u||'');
   const vh=vs.map((v,i)=>`<div class="vn" style="--i:${i+1}"><b>${esc(v.n)}</b>${v.a?`<small>${esc(v.a)}</small>`:''}${ok2(v.m)?`<a class="mp" href="${esc(v.m)}" target="_blank" rel="noopener">الموقع على الخريطة</a>`:''}</div>`).join('');
   const fm=(vs.find(v=>ok2(v.m))||{}).m;
-  const cu=!!t.custom,bg=cu?(d.bgs||[]):[],pg=i=>bg[i]?` style="background-image:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),url('${bg[i]}')"`:'';
+  const cu=!!t.custom,bg=cu?(d.bgs||[]):[],dm=Math.min(.8,Math.max(0,(+d.dim||0)/100)),pg=i=>bg[i]?` style="background-image:${dm?`linear-gradient(rgba(0,0,0,${dm}),rgba(0,0,0,${dm})),`:''}url('${bg[i]}')"`:'';
   const prog=d.showProg===false?[]:(d.prog||[]).filter(x=>x.t);
   const progH=`<div class="prg" style="--i:0"><h3>برنامج المناسبة</h3><ol>${prog.map(x=>`<li><span class="pt">${esc(x.t)}</span><i>${x.ic||''}</i><span class="ph2">${fmtT(x.h)}</span></li>`).join('')}</ol></div>`;
   const rl=d.showRules===false?[]:(d.rules||[]);
@@ -931,6 +931,7 @@ const cvb=()=>{
 <div class="nt">🎨 ارفع خلفية لكل صفحة من دعوتك بصور JPG أو PNG.</div>
 <div class="tabs">${pb.map(i=>`<button data-pg="${i}" aria-pressed="${cp===i}">صفحة ${i+1}</button>`).join('')}</div>
 <div class="bx"><div class="bt">صفحة ${cp+1}</div><div class="bh">رفع الخلفية</div>${up('bg','ارفع الخلفية','موصى به: 1080×1920 بكسل · JPG أو PNG',b[cp])}${b[cp]?'<button class="lk" data-a="rmpg">إزالة خلفية هذه الصفحة</button>':''}</div>
+<div class="bx"><div class="bt">🌗 تعتيم الخلفية (كل الصفحات)</div><input type="range" min="0" max="80" step="5" data-k="dim" value="${+S.d.dim||0}" aria-label="تعتيم الخلفية" style="width:100%"><p class="hint">0 = صورتك بألوانها الأصلية بدون تغميق. ارفعه فقط إذا النص ما يبان بوضوح.</p></div>
 <div class="bx"><div class="bt">🎨 ألوان النص (كل الصفحات)</div>${col('tc','Aa','لون النص','#ffffff')}${col('tc2','¶','لون ثانوي','#f2d58a')}<p class="hint">تطبق على كل الصفحات. اتركه فارغاً لاستخدام الإعدادات الافتراضية للقالب.</p></div>
 <div class="bx"><div class="bt">🎨 ألوان شريط الأدوات</div>${col('ic','◈','لون الأيقونات','#ffffff')}${col('tt','Aa','لون النص','#ffffff')}<p class="hint">يتحكم في ألوان أيقونات وشريط الأدوات السفلي. اتركه فارغاً لاستخدام الإعدادات الافتراضية.</p></div>
 <div class="bx"><div class="bt">🖼️ ختم الظرف</div><p class="hint">الصورة المعروضة على زر فتح الدعوة، تتجاوز الإعداد الافتراضي للقالب.</p>${up('seal','ارفع صورة الختم','موصى به: 200×200 بكسل · PNG مربع بخلفية شفافة',S.d.seal)}${S.d.seal?'<button class="lk" data-a="rmseal">إزالة الختم</button>':''}</div>
