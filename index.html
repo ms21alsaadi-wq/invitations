@@ -662,7 +662,8 @@ const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const inDays=n=>{const d=new Date(Date.now()+n*864e5);return d.toISOString().slice(0,10)};
 const DCC=['#E9E9E9','#E0A0A4','#D96060','#D93A35','#D93020','#D82E1E'];
 function nm(d,s){const[a,b]=s.split(' و');d.n1=a;d.n2=b||'';d.mode=b?'c':'s';d.names=b?a+' & '+b:a}
-function famStr(d){return d.hf?'':[d.fam1,d.fam2].filter(Boolean).join(' & ')}
+function famOn(d){return d.sf!==undefined?!!d.sf:(!d.hf&&!!(d.fam1||d.fam2))}
+function famStr(d){return famOn(d)?[d.fam1,d.fam2].filter(Boolean).join(' & '):''}
 function clean(h){return String(h||'').replace(/<\/?(?!(?:b|i|u|br|div|p|strong|em)\b)[a-z][^>]*>/gi,'').replace(/<(b|i|u|br|div|p|strong|em)\b[^>]*>/gi,'<$1>')}
 function msgHtml(d){return d.msgH?clean(d.msgH):esc(d.msg||'')}
 function normEd(el){const out=document.createElement('div');let cur=null;
@@ -1038,11 +1039,11 @@ ${tail}`}},
   const al=(v,pth)=>`<button class="eb" data-ta="${v}" aria-pressed="${(d.ta||'center')===v}" aria-label="محاذاة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="${pth}"/></svg></button>`;
   const st=(f,lab,val)=>`<span class="stp2"><small>${lab}</small><button class="eb" data-a="adj" data-f="${f}" data-dl="-1" aria-label="إنقاص">−</button><output>${val}</output><button class="eb" data-a="adj" data-f="${f}" data-dl="1" aria-label="زيادة">+</button></span>`;
   return `<div class="hintb">💡 مثال: اسم العائلة: آل الراشد · النص: «يسعدنا دعوتكم للاحتفال...»</div>
-<div class="imgc" style="margin-top:0"><div class="top"><div><b>إخفاء أسماء العائلات</b><p class="hint">لن تظهر أسماء العائلات في الدعوة والمشاركة.</p></div><button class="sw2" role="switch" aria-checked="${!!d.hf}" aria-label="إخفاء أسماء العائلات" data-a="hf"></button></div></div>
-<div class="two" style="margin-top:14px"><label>اسم العائلة (الأول)<input data-k="fam1" maxlength="24" value="${esc(d.fam1)}" placeholder="آل راشد"></label><label>اسم العائلة (الثاني)<input data-k="fam2" maxlength="24" value="${esc(d.fam2)}" placeholder="آل مهنا"></label></div>
+<div class="imgc" style="margin-top:0"><div class="top"><div><b>إظهار أسماء العائلات</b><p class="hint">فعّله إذا تبي تكتب أسماء العائلات وتظهر في الدعوة.</p></div><button class="sw2" role="switch" aria-checked="${famOn(d)}" aria-label="إظهار أسماء العائلات" data-a="hf"></button></div></div>
+${famOn(d)?`<div class="two" style="margin-top:14px"><label>اسم العائلة (الأول)<input data-k="fam1" maxlength="24" value="${esc(d.fam1)}" placeholder="آل راشد"></label><label>اسم العائلة (الثاني)<input data-k="fam2" maxlength="24" value="${esc(d.fam2)}" placeholder="آل مهنا"></label></div>
 <div class="lb">خط أسماء العائلات</div>
 <div class="tzr"><select data-k="ff" aria-label="خط أسماء العائلات"><option value="">اختر خطاً</option>${fo(d.ff)}</select><select data-k="fs" aria-label="حجم الخط" style="width:90px">${[14,16,18,20,24,28,32].map(n=>`<option${(+d.fs||18)===n?' selected':''}>${n}</option>`).join('')}</select></div>
-<div class="pvb" id="pv-f"></div>
+<div class="pvb" id="pv-f"></div>`:''}
 <div class="lb">نص الدعوة</div>
 <div class="tzr"><div class="seg">${al('right','M4 6h16M10 12h10M6 18h14')}${al('center','M4 6h16M7 12h10M5 18h14')}${al('left','M4 6h16M4 12h10M4 18h14')}</div><select data-k="tsz" aria-label="حجم الخط" style="width:90px">${[12,14,15,16,18,20,22,24].map(n=>`<option${(+d.tsz||15)===n?' selected':''}>${n}</option>`).join('')}</select></div>
 <div class="edw"><div class="etb"><button class="eb" data-ex="bold" aria-label="عريض"><b>B</b></button><button class="eb" data-ex="italic" aria-label="مائل"><i>I</i></button><button class="eb" data-ex="underline" aria-label="تسطير"><u>U</u></button>${st('tls','الأحرف',d.tls??0)}${st('tlh','الأسطر',d.tlh??1.6)}${st('tps','الفقرات',(d.tps??0)+'px')}</div><div id="ed" class="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="نص الدعوة" data-ph="يتشرفون بدعوتكم ..">${msgHtml(d)}</div></div>`}},
@@ -1238,7 +1239,7 @@ $('#wz').addEventListener('click',async e=>{
   else if(a==='lprev'){if(_pv&&!_pv.paused){_pv.pause();b.textContent='▶ استماع';return}const src=S.d.music||(S.d.mlib?libUrl(S.d.mlib):'');if(!src)return;if(!_pv||_pv._s!==src){_pv=new Audio(src);_pv._s=src;_pv.loop=true}try{_pv.currentTime=(+S.d.mh||0)*3600+(+S.d.mm||0)*60+(+S.d.ms||0)}catch(_){}_pv.play().then(()=>{b.textContent='⏸ إيقاف'}).catch(()=>{})}
   else if(a==='addv'){S.d.vs.push({n:'',a:'',m:''});draw(true)}
   else if(a==='rmv'){S.d.vs.splice(+b.dataset.i,1);syncV();draw(true)}
-  else if(a==='hf'){S.d.hf=!S.d.hf;draw(true)}
+  else if(a==='hf'){S.d.sf=!famOn(S.d);draw(true)}
   else if(a==='adj'){const f=b.dataset.f,[lo,hi,stp,df]={tls:[0,12,1,0],tlh:[1,3,.1,1.6],tps:[0,40,4,0]}[f];let v=(S.d[f]===undefined?df:+S.d[f])+stp*(+b.dataset.dl);S.d[f]=Math.round(Math.min(hi,Math.max(lo,v))*10)/10;draw(true)}
   else if(a==='hj'){S.d.hj=!S.d.hj;draw(true)}
   else if(a==='hd'){S.d.hd=b.dataset.v;draw(true)}else if(a==='rmhimg'){S.d.himg='';draw(true)}else if(a==='timg'){S.d.useImg=!S.d.useImg;draw(true)}
